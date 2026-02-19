@@ -95,5 +95,10 @@ InitTestScene*.unity*
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
 /[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
 
+# Ignore Firebase plugin binaries
+/[Aa]ssets/Firebase/Plugins/x86_64/FirebaseCppApp-*.bundle
+/[Aa]ssets/Firebase/Plugins/x86_64/FirebaseCppApp-*.so
+
+
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*

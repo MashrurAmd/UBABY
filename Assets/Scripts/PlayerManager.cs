@@ -205,11 +205,21 @@ public class PlayerManager : MonoBehaviour
         fridgeRightDoorAnimator.SetBool("Open", true);
         fridgeLeftDoorAnimator.SetBool("Open", true);
         openFridgeButton.SetActive(false);
-        closeFridgeButton.SetActive(true);
+        //closeFridgeButton.SetActive(true);
         myCameraController.moveBack = false;
         myCameraController.moveToFridge = true;
-        storeManager.StoreIsOpen();
+        StartCoroutine(OpenStoreWithDelay(0.6f));
+        //storeManager.StoreIsOpen();
+
+        IEnumerator OpenStoreWithDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            storeManager.StoreIsOpen();
+            closeFridgeButton.SetActive(true);
+        }
     }
+
+
 
     public void CloseFridge()
     {
@@ -288,5 +298,53 @@ public class PlayerManager : MonoBehaviour
     {
         yield return new WaitForSeconds(wait);
         playerAnimator.SetBool("Talking", false);
+    }
+
+  
+    
+    //switch left and right
+
+    public void SwitchRight()
+    {
+        switch (currentRoom)
+        {
+            case "office":
+                GoKitchen();
+                break;
+
+            case "kitchen":
+                GoShower();
+                break;
+
+            case "shower":
+                GoBedroom();
+                break;
+
+            case "bedroom":
+                GoOffice();
+                break;
+        }
+    }
+
+    public void SwitchLeft()
+    {
+        switch (currentRoom)
+        {
+            case "office":
+                GoBedroom();
+                break;
+
+            case "kitchen":
+                GoOffice();
+                break;
+
+            case "shower":
+                GoKitchen();
+                break;
+
+            case "bedroom":
+                GoShower();
+                break;
+        }
     }
 }

@@ -38,7 +38,19 @@ public class ShowerManager : MonoBehaviour
     }
 
     void Update()
+
     {
+        if (playerManager.currentRoom != "shower") return;
+
+        // Temporary debug - remove after fixing
+        if (Input.GetMouseButton(0))
+        {
+            Vector2 bodyScreen = Camera.main.WorldToScreenPoint(bodyCenter.position);
+            Debug.Log($"Finger: {Input.mousePosition}, Body: {bodyScreen}, Dist: {Vector2.Distance(Input.mousePosition, bodyScreen)}");
+        }
+
+
+
         if (playerManager.currentRoom != "shower") return;
 
 #if UNITY_EDITOR || UNITY_WEBGL
@@ -127,8 +139,13 @@ public class ShowerManager : MonoBehaviour
 
     bool IsOverBody(Vector2 screenPos)
     {
-        Vector2 bodyScreen = Camera.main.WorldToScreenPoint(bodyCenter.position);
-        return Vector2.Distance(screenPos, bodyScreen) < bodyRadius;
+        // Use the shower camera explicitly instead of Camera.main
+        Camera showerCam = Camera.main; // or assign a public Camera showerCamera field
+
+        Vector2 bodyScreen = showerCam.WorldToScreenPoint(bodyCenter.position);
+        float dist = Vector2.Distance(screenPos, bodyScreen);
+        Debug.Log($"[Shower] Distance to body: {dist}, bodyRadius: {bodyRadius}"); // remove after fix
+        return dist < bodyRadius;
     }
 
     // -------------------- SOAP --------------------
@@ -141,7 +158,10 @@ public class ShowerManager : MonoBehaviour
         if (_elapsed < _waitTime) return;
         _elapsed = 0f;
 
+        // Spawn foam at the soap's current screen position, inside foamParent canvas
         GameObject foam = Instantiate(foamPrefab, soapImage.transform.position, Quaternion.identity, foamParent);
+        foam.transform.localScale = Vector3.one; // ensure scale isn't broken
+        Debug.Log("[Shower] Foam spawned!"); // remove after fix
 
         if (maxSoap < .9f)
         {

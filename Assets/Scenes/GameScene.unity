@@ -1860,7 +1860,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -21070,7 +21070,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &711811333
 RectTransform:
   m_ObjectHideFlags: 0
@@ -32301,7 +32301,7 @@ MonoBehaviour:
   waterAudio: {fileID: 2033902529}
   showerProgressImage: {fileID: 1487874261}
   fillAmount: 0.005
-  bodyRadius: 150
+  bodyRadius: 250
   _waitTime: 0.05
 --- !u!114 &1244426639
 MonoBehaviour:
@@ -39989,6 +39989,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1726237244}
   - component: {fileID: 1726237245}
+  - component: {fileID: 1726237246}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -40073,6 +40074,29 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &1726237246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1726237243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
 --- !u!1 &1726563195
 GameObject:
   m_ObjectHideFlags: 0

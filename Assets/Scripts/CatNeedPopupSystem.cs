@@ -59,6 +59,8 @@ public class CatNeedsPopup : MonoBehaviour
 
                     playerAnimator.SetTrigger("Hungry");
 
+                    //if (isSleeping)
+
 
 
                 }

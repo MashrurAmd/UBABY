@@ -17636,6 +17636,11 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!1 &977723054 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6169334443994166783, guid: c9fc2d51da28efc4995f200b099a5bb4, type: 3}
+  m_PrefabInstance: {fileID: 1308585725}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &994837706
 GameObject:
   m_ObjectHideFlags: 0
@@ -22617,6 +22622,7 @@ MonoBehaviour:
   fillAmount: 0.005
   bodyRadius: 250
   _waitTime: 0.05
+  shinyParticleEffect: {fileID: 977723054}
 --- !u!114 &1244426639
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
@@ -30,6 +30,10 @@ public class ShowerManager : MonoBehaviour
     bool isHoldingSoap, isHoldingWater;
 
     float maxSoap, maxWater;
+
+
+    [Header("Effects")]
+    public GameObject shinyParticleEffect; // drag your particle prefab here
 
     void Start()
     {
@@ -187,6 +191,12 @@ public class ShowerManager : MonoBehaviour
             showerProgressImage.fillAmount += fillAmount;
             maxWater += fillAmount;
         }
+
+        // ✅ If no foam left, activate shiny effect
+        if (foamParent.childCount == 0 && maxSoap > 0)
+        {
+            shinyParticleEffect.SetActive(true);
+        }
     }
 
     // --------------------
@@ -195,5 +205,9 @@ public class ShowerManager : MonoBehaviour
     {
         foreach (Transform t in foamParent)
             Destroy(t.gameObject);
+
+        shinyParticleEffect.SetActive(false); // ✅ reset when leaving shower
+        maxSoap = 0f; // ✅ reset soap tracking
+        maxWater = 0f; // ✅ reset water tracking
     }
 }

@@ -23,6 +23,9 @@ public class CatNeedsPopup : MonoBehaviour
     public float sleepThreshold = 0.5f;
     public float showerThreshold = 0.5f;
 
+
+
+    public Animator playerAnimator; // For OpenMouth animation
     private bool popupActive;
 
     void Start()
@@ -53,6 +56,11 @@ public class CatNeedsPopup : MonoBehaviour
                     yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
                     ShowPopup("I am hungry 😿", hungryClip);
                     popupActive = false;
+
+                    playerAnimator.SetTrigger("Hungry");
+
+
+
                 }
                 else if (storeManager.kitchenProgressBar.fillAmount >= 1f)
                 {

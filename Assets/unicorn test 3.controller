@@ -157,7 +157,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: Eat
+    m_ConditionEvent: Hungry
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -1209132648112683352}
@@ -323,7 +323,7 @@ AnimatorStateMachine:
     m_Position: {x: 1130, y: 320, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 5803770278887801111}
-    m_Position: {x: 1170, y: 30, z: 0}
+    m_Position: {x: -740, y: 420, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 3827181950385802271}
     m_Position: {x: -150, y: -860, z: 0}
@@ -335,10 +335,10 @@ AnimatorStateMachine:
     m_Position: {x: 370, y: -900, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -1209132648112683352}
-    m_Position: {x: -750, y: 90, z: 0}
+    m_Position: {x: -930, y: 170, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 9218210747308062962}
-    m_Position: {x: -780, y: -230, z: 0}
+    m_Position: {x: -790, y: -260, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions:
   - {fileID: -8431153482224606784}
@@ -1177,7 +1177,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: LayingSleeping
+  m_Name: sleeping
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:

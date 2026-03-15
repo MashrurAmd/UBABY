@@ -30,6 +30,7 @@ public class PlayerManager : MonoBehaviour
     public Text recordText;
     public Image recordIcon;
     public Color recordIconColor;
+    public GameObject sleepParticleEffect;
 
     void Start()
     {
@@ -245,10 +246,12 @@ public class PlayerManager : MonoBehaviour
             playerAnimator.SetBool("Sleep", true);
             sleepButtonText.text = "Wake Up";
             sleepBG.SetActive(true);
+            sleepParticleEffect.SetActive(true);
         }
         else
         {
             WakeUp();
+            sleepParticleEffect.SetActive(false);
         }
     }
 

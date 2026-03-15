@@ -23663,7 +23663,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6169334443994166783, guid: c9fc2d51da28efc4995f200b099a5bb4, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8279047456541844258, guid: c9fc2d51da28efc4995f200b099a5bb4, type: 3}
       propertyPath: looping
@@ -23684,6 +23684,10 @@ PrefabInstance:
     - target: {fileID: 8279047456541844258, guid: c9fc2d51da28efc4995f200b099a5bb4, type: 3}
       propertyPath: ShapeModule.angle
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 8279047456541844258, guid: c9fc2d51da28efc4995f200b099a5bb4, type: 3}
+      propertyPath: ShapeModule.radiusThickness
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8279047456541844258, guid: c9fc2d51da28efc4995f200b099a5bb4, type: 3}
       propertyPath: InitialModule.maxNumParticles

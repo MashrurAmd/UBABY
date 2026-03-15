@@ -268,6 +268,7 @@ public class PlayerManager : MonoBehaviour
         else
         {
             WakeUp();
+            sleepParticleEffect.SetActive(false);
         }
     }
 

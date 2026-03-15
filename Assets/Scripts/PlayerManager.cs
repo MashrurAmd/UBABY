@@ -259,6 +259,7 @@ public class PlayerManager : MonoBehaviour
         if (!isSleeping)
         {
             isSleeping = true;
+            playerAnimator.ResetTrigger("Hungry"); // ✅ cancel any pending hungry trigger
             playerAnimator.SetBool("Sleep", true);
             sleepButtonText.text = "Wake Up";
             sleepBG.SetActive(true);
@@ -267,7 +268,6 @@ public class PlayerManager : MonoBehaviour
         else
         {
             WakeUp();
-            sleepParticleEffect.SetActive(false);
         }
     }
 

@@ -112,6 +112,9 @@ public class PlayerManager : MonoBehaviour
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
         currentRoom = office;
+        playerAnimator.SetBool("isinShower", false);
+
+        
 
         myCamera.position = officeCamera.position;
         myCamera.rotation = officeCamera.rotation;
@@ -134,6 +137,8 @@ public class PlayerManager : MonoBehaviour
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
         currentRoom = kitchen;
+
+        playerAnimator.SetBool("isinShower", false);
 
         myCamera.position = kitchenCamera.position;
         myCamera.rotation = kitchenCamera.rotation;
@@ -158,6 +163,9 @@ public class PlayerManager : MonoBehaviour
         player.transform.parent = myCamera.transform;
         currentRoom = shower;
 
+        // Add animation for shower transition
+        playerAnimator.SetBool("isinShower", true);
+
         myCamera.position = showerCamera.position;
         myCamera.rotation = showerCamera.rotation;
 
@@ -173,6 +181,13 @@ public class PlayerManager : MonoBehaviour
         kitchenButton.GetComponent<Image>().enabled = false;
         showerButton.GetComponent<Image>().enabled = true;
         bedRommButtom.GetComponent<Image>().enabled = false;
+
+        if (currentRoom != shower)
+            playerAnimator.SetBool("isinShower", false);
+        
+
+
+
     }
 
     public void GoBedroom()
@@ -180,6 +195,7 @@ public class PlayerManager : MonoBehaviour
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
         currentRoom = bedroom;
+        playerAnimator.SetBool("isinShower", false);
 
         myCamera.position = bedroomCamera.position;
         myCamera.rotation = bedroomCamera.rotation;

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 9155240061317778993}
   - component: {fileID: 8279047456541844258}
   - component: {fileID: 3875605438604561938}
-  - component: {fileID: 831453547320776440}
   m_Layer: 0
   m_Name: Sleep
   m_TagString: Untagged
@@ -4831,16 +4830,3 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &831453547320776440
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6169334443994166783}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e175cccb86ec8d643a61f4c275b0e974, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnlyDeactivate: 0

@@ -5963,27 +5963,27 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1588027239397028575, guid: 16413015e68934942af883669b039890, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9
+      value: 0.76338
       objectReference: {fileID: 0}
     - target: {fileID: 1588027239397028575, guid: 16413015e68934942af883669b039890, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9
+      value: 0.76338
       objectReference: {fileID: 0}
     - target: {fileID: 1588027239397028575, guid: 16413015e68934942af883669b039890, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.9
+      value: 0.76338
       objectReference: {fileID: 0}
     - target: {fileID: 1588027239397028575, guid: 16413015e68934942af883669b039890, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -625.46466
+      value: -624.16
       objectReference: {fileID: 0}
     - target: {fileID: 1588027239397028575, guid: 16413015e68934942af883669b039890, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -678.44946
+      value: -678.544
       objectReference: {fileID: 0}
     - target: {fileID: 1588027239397028575, guid: 16413015e68934942af883669b039890, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.262
+      value: -0.77
       objectReference: {fileID: 0}
     - target: {fileID: 1588027239397028575, guid: 16413015e68934942af883669b039890, type: 3}
       propertyPath: m_LocalRotation.w
@@ -11400,8 +11400,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 31.79, y: -31.4151}
-  m_SizeDelta: {x: 436.42, y: 738.2535}
+  m_AnchoredPosition: {x: -39.81498, y: 238.23526}
+  m_SizeDelta: {x: 293.21, y: 198.9529}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &714002527
 GameObject:
@@ -22620,7 +22620,7 @@ MonoBehaviour:
   waterAudio: {fileID: 2033902529}
   showerProgressImage: {fileID: 1487874261}
   fillAmount: 0.005
-  bodyRadius: 250
+  bodyRadius: 100
   _waitTime: 0.05
   shinyParticleEffect: {fileID: 977723054}
 --- !u!114 &1244426639

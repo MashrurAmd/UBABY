@@ -198,8 +198,11 @@ public class FirebaseAuthManager : MonoBehaviour
                         case AuthError.InvalidEmail:
                             failedMessage += "Email is invalid";
                             break;
-                        case AuthError.WrongPassword:
-                            failedMessage += "Wrong Password";
+                        case AuthError.EmailAlreadyInUse:
+                            failedMessage += "Email is already in use";
+                            break;
+                        case AuthError.WeakPassword:
+                            failedMessage += "Password is too weak";
                             break;
                         case AuthError.MissingEmail:
                             failedMessage += "Email is missing";
@@ -208,7 +211,7 @@ public class FirebaseAuthManager : MonoBehaviour
                             failedMessage += "Password is missing";
                             break;
                         default:
-                            failedMessage = "Profile update Failed";
+                            failedMessage = "Registration Failed";
                             break;
                     }
 

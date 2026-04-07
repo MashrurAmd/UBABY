@@ -9,19 +9,28 @@ public class WardrobeManager : MonoBehaviour
     public string[] glassesNames;
 
     [Header("Watches")]
-    public GameObject[] watches;        // drag all watches here
-    public Text watchNameText;          // text to show watch name
-    public string[] watchNames;         // names like "Gold Watch", "Silver Watch" etc
+    public GameObject[] watches;
+    public Text watchNameText;
+    public string[] watchNames;
 
     [Header("Navigation Buttons")]
     public GameObject leftButton;
     public GameObject rightButton;
 
+    [Header("Category Button Images")]
+    public Image glassesButtonImage;    // Image component on glasses button
+    public Image watchButtonImage;      // Image component on watch button
+    public Sprite glassesActiveSprite;  // sprite when glasses is selected
+    public Sprite glassesInactiveSprite;// sprite when glasses is not selected
+    public Sprite watchActiveSprite;    // sprite when watch is selected
+    public Sprite watchInactiveSprite;  // sprite when watch is not selected
+
     private int currentGlassIndex = -1;
     private int currentWatchIndex = -1;
 
-    private bool glassesActive = false;
-    private bool watchActive = false;
+    // ✅ Single flag to track which category is being controlled
+    private enum ActiveCategory { None, Glasses, Watch }
+    private ActiveCategory activeCategory = ActiveCategory.None;
 
     // ===========================
     // 👓 GLASSES
@@ -29,15 +38,22 @@ public class WardrobeManager : MonoBehaviour
 
     public void OnGlassesButtonClicked()
     {
-        // Hide watches if active
-        HideAllWatches();
+        // ✅ Only switch control to glasses, don't hide watches
+        activeCategory = ActiveCategory.Glasses;
 
-        glassesActive = true;
         leftButton.SetActive(true);
         rightButton.SetActive(true);
 
-        currentGlassIndex = 0;
-        ShowGlass(currentGlassIndex);
+        // ✅ Swap button images
+        glassesButtonImage.sprite = glassesActiveSprite;
+        watchButtonImage.sprite = watchInactiveSprite;
+
+        // If glasses not shown yet, start from index 0
+        if (currentGlassIndex == -1)
+        {
+            currentGlassIndex = 0;
+            ShowGlass(currentGlassIndex);
+        }
     }
 
     public void NextGlass()
@@ -45,7 +61,6 @@ public class WardrobeManager : MonoBehaviour
         currentGlassIndex++;
         if (currentGlassIndex >= glasses.Length)
             currentGlassIndex = 0;
-
         ShowGlass(currentGlassIndex);
     }
 
@@ -54,7 +69,6 @@ public class WardrobeManager : MonoBehaviour
         currentGlassIndex--;
         if (currentGlassIndex < 0)
             currentGlassIndex = glasses.Length - 1;
-
         ShowGlass(currentGlassIndex);
     }
 
@@ -75,11 +89,8 @@ public class WardrobeManager : MonoBehaviour
             glasses[i].SetActive(false);
 
         glassesNameText.text = "";
-        glassesActive = false;
         currentGlassIndex = -1;
-
-        leftButton.SetActive(false);
-        rightButton.SetActive(false);
+        glassesButtonImage.sprite = glassesInactiveSprite;
     }
 
     // ===========================
@@ -88,15 +99,22 @@ public class WardrobeManager : MonoBehaviour
 
     public void OnWatchButtonClicked()
     {
-        // Hide glasses if active
-        HideAllGlasses();
+        // ✅ Only switch control to watch, don't hide glasses
+        activeCategory = ActiveCategory.Watch;
 
-        watchActive = true;
         leftButton.SetActive(true);
         rightButton.SetActive(true);
 
-        currentWatchIndex = 0;
-        ShowWatch(currentWatchIndex);
+        // ✅ Swap button images
+        watchButtonImage.sprite = watchActiveSprite;
+        glassesButtonImage.sprite = glassesInactiveSprite;
+
+        // If watch not shown yet, start from index 0
+        if (currentWatchIndex == -1)
+        {
+            currentWatchIndex = 0;
+            ShowWatch(currentWatchIndex);
+        }
     }
 
     public void NextWatch()
@@ -104,7 +122,6 @@ public class WardrobeManager : MonoBehaviour
         currentWatchIndex++;
         if (currentWatchIndex >= watches.Length)
             currentWatchIndex = 0;
-
         ShowWatch(currentWatchIndex);
     }
 
@@ -113,7 +130,6 @@ public class WardrobeManager : MonoBehaviour
         currentWatchIndex--;
         if (currentWatchIndex < 0)
             currentWatchIndex = watches.Length - 1;
-
         ShowWatch(currentWatchIndex);
     }
 
@@ -134,11 +150,8 @@ public class WardrobeManager : MonoBehaviour
             watches[i].SetActive(false);
 
         watchNameText.text = "";
-        watchActive = false;
         currentWatchIndex = -1;
-
-        leftButton.SetActive(false);
-        rightButton.SetActive(false);
+        watchButtonImage.sprite = watchInactiveSprite;
     }
 
     // ===========================
@@ -147,13 +160,32 @@ public class WardrobeManager : MonoBehaviour
 
     public void OnRightButtonClicked()
     {
-        if (glassesActive) NextGlass();
-        else if (watchActive) NextWatch();
+        switch (activeCategory)
+        {
+            case ActiveCategory.Glasses: NextGlass(); break;
+            case ActiveCategory.Watch:   NextWatch(); break;
+        }
     }
 
     public void OnLeftButtonClicked()
     {
-        if (glassesActive) PreviousGlass();
-        else if (watchActive) PreviousWatch();
+        switch (activeCategory)
+        {
+            case ActiveCategory.Glasses: PreviousGlass(); break;
+            case ActiveCategory.Watch:   PreviousWatch();  break;
+        }
+    }
+
+    // ===========================
+    // 🔄 RESET ALL (call when leaving wardrobe)
+    // ===========================
+
+    public void ResetAll()
+    {
+        HideAllGlasses();
+        HideAllWatches();
+        activeCategory = ActiveCategory.None;
+        leftButton.SetActive(false);
+        rightButton.SetActive(false);
     }
 }

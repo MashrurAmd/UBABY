@@ -4394,7 +4394,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &274470100
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15840,6 +15840,12 @@ MonoBehaviour:
   - Rollex
   leftButton: {fileID: 401106962}
   rightButton: {fileID: 866689898}
+  glassesButtonImage: {fileID: 623234150}
+  watchButtonImage: {fileID: 1545023823}
+  glassesActiveSprite: {fileID: 21300000, guid: 6bd6f28b69e1f46789c6b842b0bd786d, type: 3}
+  glassesInactiveSprite: {fileID: 21300000, guid: 2841fd859790e4ebb91191599f3d8e28, type: 3}
+  watchActiveSprite: {fileID: 21300000, guid: 92853b45aa82c43f682395aad3ee9257, type: 3}
+  watchInactiveSprite: {fileID: 21300000, guid: 42360dcb1d00e4484a33492851bbe153, type: 3}
 --- !u!4 &845178266
 Transform:
   m_ObjectHideFlags: 0
@@ -42085,10 +42091,10 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 268407256}
+  - {fileID: 845178266}
   - {fileID: 1244426636}
   - {fileID: 1111942776}
   - {fileID: 1307816276}
   - {fileID: 1242531291}
   - {fileID: 1884185329}
   - {fileID: 1056774917}
-  - {fileID: 845178266}

@@ -26,6 +26,12 @@ public class PlayerManager : MonoBehaviour
     public Image sleepProgressBar;
     public float fillAmount;
 
+    private string wardrobe = "wardrobe";
+
+    public Transform wardrobeCamera;
+    public GameObject wardrobeButton;
+    public GameObject wardrobeUI; // your clothes changing UI
+
     AudioSource audioSource;
     public Text recordText;
     public Image recordIcon;
@@ -109,6 +115,16 @@ public class PlayerManager : MonoBehaviour
 
     public void GoOffice()
     {
+
+        // ✅ Restore bottom nav buttons
+        officeButton.SetActive(true);
+        kitchenButton.SetActive(true);
+        showerButton.SetActive(true);
+        bedRommButtom.SetActive(true);
+        wardrobeButton.SetActive(true);
+
+        wardrobeUI.SetActive(false); // ✅ hide wardrobe UI
+
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
         currentRoom = office;
@@ -130,10 +146,22 @@ public class PlayerManager : MonoBehaviour
         kitchenButton.GetComponent<Image>().enabled = false;
         showerButton.GetComponent<Image>().enabled = false;
         bedRommButtom.GetComponent<Image>().enabled = false;
+
+        wardrobeUI.SetActive(false); // add this line in GoOffice, GoKitchen, GoShower, GoBedroom
     }
 
     public void GoKitchen()
     {
+
+        officeButton.SetActive(true);
+        kitchenButton.SetActive(true);
+        showerButton.SetActive(true);
+        bedRommButtom.SetActive(true);
+        wardrobeButton.SetActive(true);
+
+        wardrobeUI.SetActive(false);
+
+
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
         currentRoom = kitchen;
@@ -159,6 +187,16 @@ public class PlayerManager : MonoBehaviour
 
     public void GoShower()
     {
+
+
+        officeButton.SetActive(true);
+        kitchenButton.SetActive(true);
+        showerButton.SetActive(true);
+        bedRommButtom.SetActive(true);
+        wardrobeButton.SetActive(true);
+
+        wardrobeUI.SetActive(false);
+
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
         currentRoom = shower;
@@ -182,6 +220,8 @@ public class PlayerManager : MonoBehaviour
         showerButton.GetComponent<Image>().enabled = true;
         bedRommButtom.GetComponent<Image>().enabled = false;
 
+        wardrobeUI.SetActive(false); // add this line in GoOffice, GoKitchen, GoShower, GoBedroom
+
         if (currentRoom != shower)
             playerAnimator.SetBool("isinShower", false);
         
@@ -192,6 +232,15 @@ public class PlayerManager : MonoBehaviour
 
     public void GoBedroom()
     {
+
+        officeButton.SetActive(true);
+        kitchenButton.SetActive(true);
+        showerButton.SetActive(true);
+        bedRommButtom.SetActive(true);
+        wardrobeButton.SetActive(true);
+
+        wardrobeUI.SetActive(false);
+
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
         currentRoom = bedroom;
@@ -210,6 +259,7 @@ public class PlayerManager : MonoBehaviour
         kitchenButton.GetComponent<Image>().enabled = false;
         showerButton.GetComponent<Image>().enabled = false;
         bedRommButtom.GetComponent<Image>().enabled = true;
+        wardrobeUI.SetActive(false); // add this line in GoOffice, GoKitchen, GoShower, GoBedroom
     }
 
     // ===========================
@@ -328,21 +378,11 @@ public class PlayerManager : MonoBehaviour
     {
         switch (currentRoom)
         {
-            case "office":
-                GoKitchen();
-                break;
-
-            case "kitchen":
-                GoShower();
-                break;
-
-            case "shower":
-                GoBedroom();
-                break;
-
-            case "bedroom":
-                GoOffice();
-                break;
+            case "office":   GoKitchen();   break;
+            case "kitchen":  GoShower();    break;
+            case "shower":   GoBedroom();   break;
+            case "bedroom":  GoWardrobe();  break; // ✅
+            case "wardrobe": GoOffice();    break; // ✅
         }
     }
 
@@ -350,21 +390,39 @@ public class PlayerManager : MonoBehaviour
     {
         switch (currentRoom)
         {
-            case "office":
-                GoBedroom();
-                break;
-
-            case "kitchen":
-                GoOffice();
-                break;
-
-            case "shower":
-                GoKitchen();
-                break;
-
-            case "bedroom":
-                GoShower();
-                break;
+            case "office":   GoWardrobe();  break; // ✅
+            case "kitchen":  GoOffice();    break;
+            case "shower":   GoKitchen();   break;
+            case "bedroom":  GoShower();    break;
+            case "wardrobe": GoBedroom();   break; // ✅
         }
     }
+
+    public void GoWardrobe()
+        {
+            switchAudio.Play();
+            player.transform.parent = myCamera.transform;
+            currentRoom = wardrobe;
+
+            myCamera.position = wardrobeCamera.position;
+            myCamera.rotation = wardrobeCamera.rotation;
+
+            openFridgeButton.SetActive(false);
+            closeFridgeButton.SetActive(false);
+            storeManager.availableProductsUI.SetActive(false);
+            showerBottomUI.SetActive(false);
+            sleepButton.SetActive(false);
+            wardrobeUI.SetActive(true);
+            WakeUp();
+
+            // ✅ Hide bottom nav buttons
+            officeButton.SetActive(false);
+            kitchenButton.SetActive(false);
+            showerButton.SetActive(false);
+            bedRommButtom.SetActive(false);
+            wardrobeButton.SetActive(false);
+        }
+
+
+
 }

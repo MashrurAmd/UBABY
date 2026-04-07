@@ -38,23 +38,22 @@ public class WardrobeManager : MonoBehaviour
 
     public void OnGlassesButtonClicked()
     {
-        // ✅ Only switch control to glasses, don't hide watches
         activeCategory = ActiveCategory.Glasses;
 
         leftButton.SetActive(true);
         rightButton.SetActive(true);
 
-        // ✅ Swap button images
         glassesButtonImage.sprite = glassesActiveSprite;
         watchButtonImage.sprite = watchInactiveSprite;
 
-        // If glasses not shown yet, start from index 0
+        // ✅ Always show current glass, no index check needed
         if (currentGlassIndex == -1)
-        {
             currentGlassIndex = 0;
-            ShowGlass(currentGlassIndex);
-        }
+
+        ShowGlass(currentGlassIndex); // ✅ always call this
     }
+
+
 
     public void NextGlass()
     {
@@ -99,22 +98,19 @@ public class WardrobeManager : MonoBehaviour
 
     public void OnWatchButtonClicked()
     {
-        // ✅ Only switch control to watch, don't hide glasses
         activeCategory = ActiveCategory.Watch;
 
         leftButton.SetActive(true);
         rightButton.SetActive(true);
 
-        // ✅ Swap button images
         watchButtonImage.sprite = watchActiveSprite;
         glassesButtonImage.sprite = glassesInactiveSprite;
 
-        // If watch not shown yet, start from index 0
+        // ✅ Always show current watch, no index check needed
         if (currentWatchIndex == -1)
-        {
             currentWatchIndex = 0;
-            ShowWatch(currentWatchIndex);
-        }
+
+        ShowWatch(currentWatchIndex); // ✅ always call this
     }
 
     public void NextWatch()

@@ -243,7 +243,7 @@ public class WardrobeManager : MonoBehaviour
         {
             case ActiveCategory.Glasses: PreviousGlass(); break;
             case ActiveCategory.Watch:   PreviousWatch();  break;
-            case ActiveCategory.Hat:     PreviousWatch();break;
+            case ActiveCategory.Hat:     PreviousHat();break;
         }
     }
 

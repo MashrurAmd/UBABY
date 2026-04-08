@@ -2002,7 +2002,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 67b3bdfdb9a0c47978216f86ec40ec9f, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16024,6 +16024,17 @@ MonoBehaviour:
   - Shades
   - Green
   - White
+  hats:
+  - {fileID: 1891680948}
+  - {fileID: 1149673548}
+  - {fileID: 1288326360}
+  - {fileID: 1166056337}
+  hatNameText: {fileID: 1786380253}
+  hatNames:
+  - Sports
+  - jogging
+  - Golf
+  - Running
   watches:
   - {fileID: 729182906}
   - {fileID: 2057278369}
@@ -16043,10 +16054,13 @@ MonoBehaviour:
   rightButton: {fileID: 866689898}
   glassesButtonImage: {fileID: 623234150}
   watchButtonImage: {fileID: 1545023823}
+  hatButtonImage: {fileID: 951265007}
   glassesActiveSprite: {fileID: 21300000, guid: 6bd6f28b69e1f46789c6b842b0bd786d, type: 3}
   glassesInactiveSprite: {fileID: 21300000, guid: 2841fd859790e4ebb91191599f3d8e28, type: 3}
   watchActiveSprite: {fileID: 21300000, guid: 92853b45aa82c43f682395aad3ee9257, type: 3}
   watchInactiveSprite: {fileID: 21300000, guid: 42360dcb1d00e4484a33492851bbe153, type: 3}
+  hatActiveSprite: {fileID: 21300000, guid: 0b44211ec277e48c1a90e9974faf11d4, type: 3}
+  hatInactiveSprite: {fileID: 21300000, guid: 96f9ddd918bee449998887b84ca1aac8, type: 3}
 --- !u!4 &845178266
 Transform:
   m_ObjectHideFlags: 0
@@ -18055,7 +18069,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 951265007}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 845178265}
+        m_TargetAssemblyTypeName: WardrobeManager, Assembly-CSharp
+        m_MethodName: OnHatButtonClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &951265007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24004,6 +24030,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 906896663}
   m_SourcePrefab: {fileID: 100100000, guid: 3802bb07f3da4ab43b8116774a8261c7, type: 3}
+--- !u!1 &1149673548 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 276e00cb65c014d0abd39737045424dc, type: 3}
+  m_PrefabInstance: {fileID: 1124485060}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1151156516
 GameObject:
   m_ObjectHideFlags: 0
@@ -24334,6 +24365,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1165808613}
   m_CullTransparentMesh: 1
+--- !u!1 &1166056337 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 67b3bdfdb9a0c47978216f86ec40ec9f, type: 3}
+  m_PrefabInstance: {fileID: 1964985878}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1166056338 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 67b3bdfdb9a0c47978216f86ec40ec9f, type: 3}
@@ -26873,6 +26909,11 @@ Transform:
   - {fileID: 924566241}
   m_Father: {fileID: 712721654}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1288326360 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 67b3bdfdb9a0c47978216f86ec40ec9f, type: 3}
+  m_PrefabInstance: {fileID: 118330566}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1288326361 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 67b3bdfdb9a0c47978216f86ec40ec9f, type: 3}
@@ -38374,6 +38415,11 @@ Transform:
   - {fileID: 1154950305}
   m_Father: {fileID: 1565847524}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1891680948 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 1aaea2b67a6204b5cac39166bcb8f445, type: 3}
+  m_PrefabInstance: {fileID: 774693345}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1891680949 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1aaea2b67a6204b5cac39166bcb8f445, type: 3}

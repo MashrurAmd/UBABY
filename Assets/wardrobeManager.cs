@@ -8,6 +8,12 @@ public class WardrobeManager : MonoBehaviour
     public Text glassesNameText;
     public string[] glassesNames;
 
+
+    [Header("Hats")]
+    public GameObject[] hats;
+    public Text hatNameText;
+    public string[] hatNames;
+
     [Header("Watches")]
     public GameObject[] watches;
     public Text watchNameText;
@@ -20,16 +26,20 @@ public class WardrobeManager : MonoBehaviour
     [Header("Category Button Images")]
     public Image glassesButtonImage;    // Image component on glasses button
     public Image watchButtonImage;      // Image component on watch button
+    public Image hatButtonImage;
     public Sprite glassesActiveSprite;  // sprite when glasses is selected
     public Sprite glassesInactiveSprite;// sprite when glasses is not selected
     public Sprite watchActiveSprite;    // sprite when watch is selected
     public Sprite watchInactiveSprite;  // sprite when watch is not selected
+    public Sprite hatActiveSprite;
+    public Sprite hatInactiveSprite;
 
     private int currentGlassIndex = -1;
     private int currentWatchIndex = -1;
+    private int currentHatIndex = -1;
 
     // ✅ Single flag to track which category is being controlled
-    private enum ActiveCategory { None, Glasses, Watch }
+    private enum ActiveCategory { None, Glasses, Watch, Hat }
     private ActiveCategory activeCategory = ActiveCategory.None;
 
     // ===========================
@@ -45,6 +55,7 @@ public class WardrobeManager : MonoBehaviour
 
         glassesButtonImage.sprite = glassesActiveSprite;
         watchButtonImage.sprite = watchInactiveSprite;
+        hatButtonImage.sprite = hatInactiveSprite; // ✅ reset hat
 
         // ✅ Always show current glass, no index check needed
         if (currentGlassIndex == -1)
@@ -105,6 +116,7 @@ public class WardrobeManager : MonoBehaviour
 
         watchButtonImage.sprite = watchActiveSprite;
         glassesButtonImage.sprite = glassesInactiveSprite;
+        hatButtonImage.sprite = hatInactiveSprite; // ✅ reset hat
 
         // ✅ Always show current watch, no index check needed
         if (currentWatchIndex == -1)
@@ -150,6 +162,67 @@ public class WardrobeManager : MonoBehaviour
         watchButtonImage.sprite = watchInactiveSprite;
     }
 
+
+        // ===========================
+        // 🎩 HATS
+        // ===========================
+
+    public void OnHatButtonClicked()
+    {
+        activeCategory = ActiveCategory.Hat;
+
+        leftButton.SetActive(true);
+        rightButton.SetActive(true);
+
+        hatButtonImage.sprite = hatActiveSprite;
+        glassesButtonImage.sprite = glassesInactiveSprite; // ✅ reset glasses
+        watchButtonImage.sprite = watchInactiveSprite;     // ✅ reset watch
+
+        if (currentHatIndex == -1)
+            currentHatIndex = 0;
+
+        ShowHat(currentHatIndex);
+    }
+
+        public void NextHat()
+        {
+            currentHatIndex++;
+            if (currentHatIndex >= hats.Length)
+                currentHatIndex = 0;
+            ShowHat(currentHatIndex);
+        }
+
+        public void PreviousHat()
+        {
+            currentHatIndex--;
+            if (currentHatIndex < 0)
+                currentHatIndex = hats.Length - 1;
+            ShowHat(currentHatIndex);
+        }
+
+        void ShowHat(int index)
+        {
+            for (int i = 0; i < hats.Length; i++)
+                hats[i].SetActive(false);
+
+            hats[index].SetActive(true);
+
+            if (hatNames.Length > index)
+                hatNameText.text = hatNames[index];
+        }
+
+        public void HideAllHats()
+        {
+            for (int i = 0; i < hats.Length; i++)
+                hats[i].SetActive(false);
+
+            hatNameText.text = "";
+            currentHatIndex = -1;
+            hatButtonImage.sprite = hatInactiveSprite;
+        }
+
+
+
     // ===========================
     // 🔄 SHARED LEFT/RIGHT BUTTONS
     // ===========================
@@ -160,6 +233,7 @@ public class WardrobeManager : MonoBehaviour
         {
             case ActiveCategory.Glasses: NextGlass(); break;
             case ActiveCategory.Watch:   NextWatch(); break;
+            case ActiveCategory.Hat:     NextHat();break;
         }
     }
 
@@ -169,6 +243,7 @@ public class WardrobeManager : MonoBehaviour
         {
             case ActiveCategory.Glasses: PreviousGlass(); break;
             case ActiveCategory.Watch:   PreviousWatch();  break;
+            case ActiveCategory.Hat:     PreviousWatch();break;
         }
     }
 
@@ -180,6 +255,7 @@ public class WardrobeManager : MonoBehaviour
     {
         HideAllGlasses();
         HideAllWatches();
+        HideAllHats();
         activeCategory = ActiveCategory.None;
         leftButton.SetActive(false);
         rightButton.SetActive(false);

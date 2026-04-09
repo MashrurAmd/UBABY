@@ -115,6 +115,8 @@ public class PlayerManager : MonoBehaviour
 
     public void GoOffice()
     {
+        currentRoom = office;
+        UpdateRoomCamera();
 
         // ✅ Restore bottom nav buttons
         officeButton.SetActive(true);
@@ -152,6 +154,8 @@ public class PlayerManager : MonoBehaviour
 
     public void GoKitchen()
     {
+        currentRoom = kitchen;
+        UpdateRoomCamera();
 
         officeButton.SetActive(true);
         kitchenButton.SetActive(true);
@@ -187,6 +191,9 @@ public class PlayerManager : MonoBehaviour
 
     public void GoShower()
     {
+
+        currentRoom = shower;
+        UpdateRoomCamera();
 
 
         officeButton.SetActive(true);
@@ -232,6 +239,9 @@ public class PlayerManager : MonoBehaviour
 
     public void GoBedroom()
     {
+
+        currentRoom = bedroom;
+        UpdateRoomCamera();
 
         officeButton.SetActive(true);
         kitchenButton.SetActive(true);
@@ -400,6 +410,11 @@ public class PlayerManager : MonoBehaviour
 
     public void GoWardrobe()
         {
+
+            currentRoom = wardrobe;
+            UpdateRoomCamera();
+
+
             switchAudio.Play();
             player.transform.parent = myCamera.transform;
             currentRoom = wardrobe;
@@ -423,6 +438,16 @@ public class PlayerManager : MonoBehaviour
             wardrobeButton.SetActive(false);
         }
 
+    void UpdateRoomCamera()
+    {
+        officeCamera.gameObject.SetActive(currentRoom == office);
+        kitchenCamera.gameObject.SetActive(currentRoom == kitchen);
+        showerCamera.gameObject.SetActive(currentRoom == shower);
+        bedroomCamera.gameObject.SetActive(currentRoom == bedroom);
+        wardrobeCamera.gameObject.SetActive(currentRoom == wardrobe);
 
+        // optional: disable main camera
+        //myCamera.gameObject.SetActive(false);
+    }
 
 }

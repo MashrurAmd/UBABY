@@ -12984,8 +12984,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -39.81498, y: 238.23526}
-  m_SizeDelta: {x: 293.21, y: 198.9529}
+  m_AnchoredPosition: {x: 1.4486, y: 269.76453}
+  m_SizeDelta: {x: 375.737, y: 483.1843}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &712721653
 GameObject:
@@ -26013,7 +26013,7 @@ MonoBehaviour:
   waterAudio: {fileID: 2033902529}
   showerProgressImage: {fileID: 1487874261}
   fillAmount: 0.005
-  bodyRadius: 100
+  bodyRadius: 350
   _waitTime: 0.05
   shinyParticleEffect: {fileID: 977723054}
 --- !u!114 &1244426639

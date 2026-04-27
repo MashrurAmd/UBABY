@@ -2,6 +2,8 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using System.Collections;
+
 
 public class ShowerManager : MonoBehaviour
 {
@@ -24,9 +26,12 @@ public class ShowerManager : MonoBehaviour
     public Material cleanMaterial;       // normal clean material
     public Material dirtyMaterial;       // dirty/mud material
     public float dirtyTimer = 60f;       // 1 minute before getting dirty again
+    public float fadeDuration = 2f; // ✅ how long the fade takes in seconds
+    
 
     private float dirtyElapsed = 0f;
     private bool isClean = true;
+    private bool isFading = false;
 
     [Header("Body Area (screen space)")]
     public float bodyRadius = 150f;
@@ -112,6 +117,8 @@ public class ShowerManager : MonoBehaviour
             waterAudio.Play();
         }
     }
+    
+    
 
     void OnDrag(Vector2 pos)
     {
@@ -151,28 +158,16 @@ public class ShowerManager : MonoBehaviour
     {
         isClean = true;
         dirtyElapsed = 0f;
-
-        // ✅ swap all material slots
-        Material[] mats = characterRenderer.materials;
-        for (int i = 0; i < mats.Length; i++)
-            mats[i] = cleanMaterial;
-        characterRenderer.materials = mats;
-
-        Debug.Log("✅ Material set to CLEAN"); // remove after fix
+        StartCoroutine(FadeToMaterial(cleanMaterial)); // ✅ fade instead of snap
+        Debug.Log("✅ Fading to CLEAN");
     }
 
     void SetDirty()
     {
         isClean = false;
         dirtyElapsed = 0f;
-
-        // ✅ swap all material slots
-        Material[] mats = characterRenderer.materials;
-        for (int i = 0; i < mats.Length; i++)
-            mats[i] = dirtyMaterial;
-        characterRenderer.materials = mats;
-
-        Debug.Log("✅ Material set to DIRTY"); // remove after fix
+        StartCoroutine(FadeToMaterial(dirtyMaterial)); // ✅ fade instead of snap
+        Debug.Log("✅ Fading to DIRTY");
     }
 
     // -------------------- UI RAYCAST --------------------
@@ -274,4 +269,40 @@ public class ShowerManager : MonoBehaviour
         maxSoap = 0f;
         maxWater = 0f;
     }
+    
+    IEnumerator FadeToMaterial(Material targetMaterial)
+    {
+        if (isFading) yield break; // ✅ prevent multiple fades at once
+        isFading = true;
+
+        Material currentMat = characterRenderer.material;
+        float elapsed = 0f;
+
+        // ✅ Create a temporary material to lerp between
+        Material tempMat = new Material(currentMat);
+        characterRenderer.material = tempMat;
+
+        Color startColor = currentMat.color;
+        Color endColor = targetMaterial.color;
+
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / fadeDuration;
+
+            // ✅ Smoothly lerp the color
+            tempMat.color = Color.Lerp(startColor, endColor, t);
+
+            // ✅ Also lerp any texture if needed
+            tempMat.Lerp(currentMat, targetMaterial, t);
+
+            yield return null;
+        }
+
+        // ✅ Set final material cleanly
+        characterRenderer.material = targetMaterial;
+        isFading = false;
+    }
+    
+    
 }

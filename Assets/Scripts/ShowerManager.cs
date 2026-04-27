@@ -56,30 +56,26 @@ public class ShowerManager : MonoBehaviour
     }
 
     void Update()
-
     {
-        if (playerManager.currentRoom != "shower") return;
-
-        // Temporary debug - remove after fixing
-        if (Input.GetMouseButton(0))
-        {
-            Vector2 bodyScreen = Camera.main.WorldToScreenPoint(bodyCenter.position);
-            Debug.Log($"Finger: {Input.mousePosition}, Body: {bodyScreen}, Dist: {Vector2.Distance(Input.mousePosition, bodyScreen)}");
-        }
-        
-        // ✅ Dirt timer - gets dirty after 1 minute of being clean
+        // ✅ Dirt timer runs in ALL rooms - move it above the shower check
         if (isClean)
         {
             dirtyElapsed += Time.deltaTime;
+            Debug.Log($"Dirty timer: {dirtyElapsed}/{dirtyTimer}"); // remove after fix
             if (dirtyElapsed >= dirtyTimer)
             {
                 SetDirty();
             }
         }
 
-
-
+        // ⬇️ Everything below is shower-only
         if (playerManager.currentRoom != "shower") return;
+
+        if (Input.GetMouseButton(0))
+        {
+            Vector2 bodyScreen = Camera.main.WorldToScreenPoint(bodyCenter.position);
+            Debug.Log($"Finger: {Input.mousePosition}, Body: {bodyScreen}, Dist: {Vector2.Distance(Input.mousePosition, bodyScreen)}");
+        }
 
 #if UNITY_EDITOR || UNITY_WEBGL
         if (Input.GetMouseButtonDown(0))
@@ -91,13 +87,13 @@ public class ShowerManager : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
             OnUp();
 #else
-        if (Input.touchCount > 0)
-        {
-            Touch t = Input.GetTouch(0);
-            if (t.phase == TouchPhase.Began) OnDown(t.position);
-            if (t.phase == TouchPhase.Moved || t.phase == TouchPhase.Stationary) OnDrag(t.position);
-            if (t.phase == TouchPhase.Ended || t.phase == TouchPhase.Canceled) OnUp();
-        }
+    if (Input.touchCount > 0)
+    {
+        Touch t = Input.GetTouch(0);
+        if (t.phase == TouchPhase.Began) OnDown(t.position);
+        if (t.phase == TouchPhase.Moved || t.phase == TouchPhase.Stationary) OnDrag(t.position);
+        if (t.phase == TouchPhase.Ended || t.phase == TouchPhase.Canceled) OnUp();
+    }
 #endif
     }
 
@@ -155,14 +151,28 @@ public class ShowerManager : MonoBehaviour
     {
         isClean = true;
         dirtyElapsed = 0f;
-        characterRenderer.material = cleanMaterial; // ✅ swap to clean material
+
+        // ✅ swap all material slots
+        Material[] mats = characterRenderer.materials;
+        for (int i = 0; i < mats.Length; i++)
+            mats[i] = cleanMaterial;
+        characterRenderer.materials = mats;
+
+        Debug.Log("✅ Material set to CLEAN"); // remove after fix
     }
 
     void SetDirty()
     {
         isClean = false;
         dirtyElapsed = 0f;
-        characterRenderer.material = dirtyMaterial; // ✅ swap to dirty material
+
+        // ✅ swap all material slots
+        Material[] mats = characterRenderer.materials;
+        for (int i = 0; i < mats.Length; i++)
+            mats[i] = dirtyMaterial;
+        characterRenderer.materials = mats;
+
+        Debug.Log("✅ Material set to DIRTY"); // remove after fix
     }
 
     // -------------------- UI RAYCAST --------------------

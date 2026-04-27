@@ -17949,11 +17949,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 942254895}
   m_CullTransparentMesh: 1
---- !u!137 &947298325 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 8417361359673230750, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
-  m_PrefabInstance: {fileID: 962849422}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &948988235
 GameObject:
   m_ObjectHideFlags: 0
@@ -18673,6 +18668,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -122.305565
       objectReference: {fileID: 0}
+    - target: {fileID: -7067901544499718395, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -6953668286976556474, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0.5823803
@@ -19096,6 +19095,10 @@ PrefabInstance:
     - target: {fileID: -2485350161823896382, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -38.518513
+      objectReference: {fileID: 0}
+    - target: {fileID: -2297601977556537484, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -2265670843074021771, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -20356,6 +20359,11 @@ Camera:
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6169334443994166783, guid: c9fc2d51da28efc4995f200b099a5bb4, type: 3}
   m_PrefabInstance: {fileID: 1308585725}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &989678217 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -6809727484017621449, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
+  m_PrefabInstance: {fileID: 962849422}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &991026676
 PrefabInstance:
@@ -26018,7 +26026,7 @@ MonoBehaviour:
   waterAudio: {fileID: 2033902529}
   showerProgressImage: {fileID: 1487874261}
   fillAmount: 0.005
-  characterRenderer: {fileID: 947298325}
+  characterRenderer: {fileID: 989678217}
   cleanMaterial: {fileID: -1304800872501700907, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
   dirtyMaterial: {fileID: 2100000, guid: 16bf2f2eab157448b89fc798a6cb006f, type: 2}
   dirtyTimer: 10

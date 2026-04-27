@@ -18719,7 +18719,7 @@ PrefabInstance:
     - target: {fileID: -6809727484017621449, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 60e954a53e71510458c296fe2678565d, type: 2}
+      objectReference: {fileID: -1304800872501700907, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
     - target: {fileID: -6803169544883306252, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 64.115875
@@ -26167,6 +26167,7 @@ MonoBehaviour:
   hungerThreshold: 0.5
   sleepThreshold: 0.5
   showerThreshold: 0.5
+  hungryCooldown: 20
   playerAnimator: {fileID: 1826472111}
 --- !u!114 &1244426643
 MonoBehaviour:

@@ -22,6 +22,7 @@ public class ShowerManager : MonoBehaviour
     [Header("Body Area (screen space)")]
     public float bodyRadius = 150f;
 
+
     [Header("Timing")]
     public float _waitTime = 0.15f;
     float _elapsed;
@@ -34,7 +35,11 @@ public class ShowerManager : MonoBehaviour
 
     [Header("Effects")]
     public GameObject shinyParticleEffect; // drag your particle prefab here
-
+    public AudioSource bubbleAudio; // ✅ drag your bubble sound AudioSource here
+    
+    
+    
+    
     void Start()
     {
         soapStartPos = soapImage.transform.position;
@@ -111,7 +116,10 @@ public class ShowerManager : MonoBehaviour
     void OnUp()
     {
         if (isHoldingSoap)
+        {
             soapImage.transform.position = soapStartPos;
+            bubbleAudio.Stop(); // ✅ stop bubble sound when finger lifted
+        }
 
         if (isHoldingWater)
         {
@@ -156,16 +164,24 @@ public class ShowerManager : MonoBehaviour
 
     void TryCreateFoam(Vector2 pos)
     {
-        if (!IsOverBody(pos)) return;
+        if (!IsOverBody(pos))
+        {
+            // ✅ stop bubble sound when not over body
+            if (bubbleAudio.isPlaying)
+                bubbleAudio.Stop();
+            return;
+        }
+
+        // ✅ play bubble sound when rubbing on body
+        if (!bubbleAudio.isPlaying)
+            bubbleAudio.Play();
 
         _elapsed += Time.deltaTime;
         if (_elapsed < _waitTime) return;
         _elapsed = 0f;
 
-        // Spawn foam at the soap's current screen position, inside foamParent canvas
         GameObject foam = Instantiate(foamPrefab, soapImage.transform.position, Quaternion.identity, foamParent);
-        foam.transform.localScale = Vector3.one; // ensure scale isn't broken
-        Debug.Log("[Shower] Foam spawned!"); // remove after fix
+        foam.transform.localScale = Vector3.one;
 
         if (maxSoap < .9f)
         {

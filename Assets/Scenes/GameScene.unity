@@ -26016,6 +26016,7 @@ MonoBehaviour:
   bodyRadius: 350
   _waitTime: 0.05
   shinyParticleEffect: {fileID: 977723054}
+  bubbleAudio: {fileID: 1244426641}
 --- !u!114 &1244426639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26052,11 +26053,11 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: e8cec47e461c745488ffccf662a224a4, type: 3}
+  m_audioClip: {fileID: 8300000, guid: c52a331d14b7e4d30baa46487feca415, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1.5
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

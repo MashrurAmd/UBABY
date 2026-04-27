@@ -17949,6 +17949,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 942254895}
   m_CullTransparentMesh: 1
+--- !u!137 &947298325 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8417361359673230750, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
+  m_PrefabInstance: {fileID: 962849422}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &948988235
 GameObject:
   m_ObjectHideFlags: 0
@@ -26013,6 +26018,10 @@ MonoBehaviour:
   waterAudio: {fileID: 2033902529}
   showerProgressImage: {fileID: 1487874261}
   fillAmount: 0.005
+  characterRenderer: {fileID: 947298325}
+  cleanMaterial: {fileID: -1304800872501700907, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
+  dirtyMaterial: {fileID: 2100000, guid: 16bf2f2eab157448b89fc798a6cb006f, type: 2}
+  dirtyTimer: 10
   bodyRadius: 350
   _waitTime: 0.05
   shinyParticleEffect: {fileID: 977723054}

@@ -18,6 +18,15 @@ public class ShowerManager : MonoBehaviour
     public AudioSource waterAudio;
     public Image showerProgressImage;
     public float fillAmount = 0.05f;
+    
+    [Header("Mud System")]
+    public Renderer characterRenderer;   // drag character renderer here
+    public Material cleanMaterial;       // normal clean material
+    public Material dirtyMaterial;       // dirty/mud material
+    public float dirtyTimer = 60f;       // 1 minute before getting dirty again
+
+    private float dirtyElapsed = 0f;
+    private bool isClean = true;
 
     [Header("Body Area (screen space)")]
     public float bodyRadius = 150f;
@@ -56,6 +65,16 @@ public class ShowerManager : MonoBehaviour
         {
             Vector2 bodyScreen = Camera.main.WorldToScreenPoint(bodyCenter.position);
             Debug.Log($"Finger: {Input.mousePosition}, Body: {bodyScreen}, Dist: {Vector2.Distance(Input.mousePosition, bodyScreen)}");
+        }
+        
+        // ✅ Dirt timer - gets dirty after 1 minute of being clean
+        if (isClean)
+        {
+            dirtyElapsed += Time.deltaTime;
+            if (dirtyElapsed >= dirtyTimer)
+            {
+                SetDirty();
+            }
         }
 
 
@@ -130,6 +149,21 @@ public class ShowerManager : MonoBehaviour
         isHoldingSoap = false;
         isHoldingWater = false;
     }
+    
+    
+    void SetClean()
+    {
+        isClean = true;
+        dirtyElapsed = 0f;
+        characterRenderer.material = cleanMaterial; // ✅ swap to clean material
+    }
+
+    void SetDirty()
+    {
+        isClean = false;
+        dirtyElapsed = 0f;
+        characterRenderer.material = dirtyMaterial; // ✅ swap to dirty material
+    }
 
     // -------------------- UI RAYCAST --------------------
 
@@ -166,21 +200,22 @@ public class ShowerManager : MonoBehaviour
     {
         if (!IsOverBody(pos))
         {
-            // ✅ stop bubble sound when not over body
             if (bubbleAudio.isPlaying)
                 bubbleAudio.Stop();
             return;
         }
 
-        // ✅ play bubble sound when rubbing on body
         if (!bubbleAudio.isPlaying)
             bubbleAudio.Play();
+
+        shinyParticleEffect.SetActive(false);
 
         _elapsed += Time.deltaTime;
         if (_elapsed < _waitTime) return;
         _elapsed = 0f;
 
-        GameObject foam = Instantiate(foamPrefab, soapImage.transform.position, Quaternion.identity, foamParent);
+        GameObject foam = Instantiate(foamPrefab, soapImage.transform.position,
+            Quaternion.identity, foamParent);
         foam.transform.localScale = Vector3.one;
 
         if (maxSoap < .9f)
@@ -208,10 +243,13 @@ public class ShowerManager : MonoBehaviour
             maxWater += fillAmount;
         }
 
-        // ✅ If no foam left, activate shiny effect
+        // ✅ When all foam cleared and soap was applied → go clean
         if (foamParent.childCount == 0 && maxSoap > 0)
         {
             shinyParticleEffect.SetActive(true);
+            SetClean();         // ✅ swap to clean material
+            maxSoap = 0f;
+            maxWater = 0f;
         }
     }
 
@@ -222,8 +260,8 @@ public class ShowerManager : MonoBehaviour
         foreach (Transform t in foamParent)
             Destroy(t.gameObject);
 
-        shinyParticleEffect.SetActive(false); // ✅ reset when leaving shower
-        maxSoap = 0f; // ✅ reset soap tracking
-        maxWater = 0f; // ✅ reset water tracking
+        shinyParticleEffect.SetActive(false);
+        maxSoap = 0f;
+        maxWater = 0f;
     }
 }

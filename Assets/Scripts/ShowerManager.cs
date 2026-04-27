@@ -26,7 +26,7 @@ public class ShowerManager : MonoBehaviour
     public Material cleanMaterial;       // normal clean material
     public Material dirtyMaterial;       // dirty/mud material
     public float dirtyTimer = 60f;       // 1 minute before getting dirty again
-    public float fadeDuration = 2f; // ✅ how long the fade takes in seconds
+    public float fadeDuration = 5f; // ✅ how long the fade takes in seconds
     
 
     private float dirtyElapsed = 0f;

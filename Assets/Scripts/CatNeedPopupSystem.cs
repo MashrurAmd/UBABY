@@ -5,9 +5,9 @@ using UnityEngine.UI;
 public class CatNeedsPopup : MonoBehaviour
 {
     [Header("References")]
-    public PlayerManager playerManager;      // Sleep + Talking/Listening Anim
-    public ShowerManager showerManager;      // Shower
-    public StoreManager storeManager;        // Hunger
+    public PlayerManager playerManager;
+    public ShowerManager showerManager;
+    public StoreManager storeManager;
 
     [Header("Popup UI")]
     public Text popupText;
@@ -17,15 +17,17 @@ public class CatNeedsPopup : MonoBehaviour
     public float popupDuration = 1f;
 
     [Header("Settings")]
-    public float minDelay = 30f;  // seconds
-    public float maxDelay = 60f;  // seconds
+    public float minDelay = 30f;
+    public float maxDelay = 60f;
     public float hungerThreshold = 0.5f;
     public float sleepThreshold = 0.5f;
     public float showerThreshold = 0.5f;
 
+    [Header("Animation Cooldown")]
+    public float hungryCooldown = 20f; // ✅ 20 seconds between hungry animations
+    private float lastHungryAnimTime = -999f; // ✅ track last time animation played
 
-
-    public Animator playerAnimator; // For OpenMouth animation
+    public Animator playerAnimator;
     private bool popupActive;
 
     void Start()
@@ -37,7 +39,6 @@ public class CatNeedsPopup : MonoBehaviour
     {
         while (true)
         {
-            // Agar Talking ya Listening animation chal rahi hai → skip popup
             if (playerManager.playerAnimator.GetBool("Talking") ||
                 playerManager.playerAnimator.GetBool("Listening"))
             {
@@ -47,27 +48,26 @@ public class CatNeedsPopup : MonoBehaviour
 
             if (!popupActive)
             {
-                // ----- PRIORITY CHECK: Hunger > Sleep > Shower -----
-
                 // --- HUNGER ---
                 if (storeManager.kitchenProgressBar.fillAmount < hungerThreshold)
                 {
                     popupActive = true;
                     yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
                     ShowPopup("I am hungry 😿", hungryClip);
+
+                    // ✅ Only trigger animation if cooldown has passed
+                    if (Time.time - lastHungryAnimTime >= hungryCooldown)
+                    {
+                        playerAnimator.SetTrigger("Hungry");
+                        lastHungryAnimTime = Time.time; // ✅ update last trigger time
+                    }
+
                     popupActive = false;
-
-                    playerAnimator.SetTrigger("Hungry");
-
-                    //if (isSleeping)
-
-
-
                 }
                 else if (storeManager.kitchenProgressBar.fillAmount >= 1f)
                 {
                     popupActive = true;
-                    ShowPopup("I am full 😺", fullClip, false); // no animation
+                    ShowPopup("I am full 😺", fullClip, false);
                     popupActive = false;
                 }
 
@@ -82,7 +82,7 @@ public class CatNeedsPopup : MonoBehaviour
                 else if (playerManager.sleepProgressBar.fillAmount >= 1f)
                 {
                     popupActive = true;
-                    ShowPopup("Sleep done 😴", fullClip, false); // no animation
+                    ShowPopup("Sleep done 😴", fullClip, false);
                     popupActive = false;
                 }
 
@@ -97,7 +97,7 @@ public class CatNeedsPopup : MonoBehaviour
                 else if (showerManager.showerProgressImage.fillAmount >= 1f)
                 {
                     popupActive = true;
-                    ShowPopup("Shower done 🚿", fullClip, false); // no animation
+                    ShowPopup("Shower done 🚿", fullClip, false);
                     popupActive = false;
                 }
             }
@@ -112,7 +112,6 @@ public class CatNeedsPopup : MonoBehaviour
 
         if (popupText)
         {
-            // Agar allowAnimation false → No animation, sirf fade
             if (allowAnimation)
                 StartCoroutine(PopupRoutine(msg));
             else

@@ -26029,7 +26029,8 @@ MonoBehaviour:
   characterRenderer: {fileID: 989678217}
   cleanMaterial: {fileID: -1304800872501700907, guid: c9350b0d044010b488ef2726ffb39ba0, type: 3}
   dirtyMaterial: {fileID: 2100000, guid: 16bf2f2eab157448b89fc798a6cb006f, type: 2}
-  dirtyTimer: 10
+  dirtyTimer: 300
+  fadeDuration: 2
   bodyRadius: 350
   _waitTime: 0.05
   shinyParticleEffect: {fileID: 977723054}

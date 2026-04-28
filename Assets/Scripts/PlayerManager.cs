@@ -26,6 +26,10 @@ public class PlayerManager : MonoBehaviour
     public Image sleepProgressBar;
     public float fillAmount;
 
+    
+    [Header("Body Hit")]
+    public Collider playerCollider; // drag character's collider here
+    
     private string wardrobe = "wardrobe";
 
     public Transform wardrobeCamera;
@@ -57,6 +61,20 @@ public class PlayerManager : MonoBehaviour
 
     void Update()
     {
+        
+        // ✅ Body hit detection - add at the very top
+        if (Input.GetMouseButtonDown(0))
+        {
+            CheckBodyHit(Input.mousePosition);
+        }
+
+#if !UNITY_EDITOR
+    if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+    {
+        CheckBodyHit(Input.GetTouch(0).position);
+    }
+#endif
+        
         if (isRecording)
         {
             _elapsed += Time.deltaTime;
@@ -155,6 +173,27 @@ public class PlayerManager : MonoBehaviour
         bedRommButtom.GetComponent<Image>().enabled = false;
 
         wardrobeUI.SetActive(false); // add this line in GoOffice, GoKitchen, GoShower, GoBedroom
+    }
+    
+    // ===========================
+// 👊 BODY HIT
+// ===========================
+
+    void CheckBodyHit(Vector2 screenPos)
+    {
+        // ✅ Don't trigger if sleeping or recording
+        if (isSleeping || isRecording) return;
+
+        Ray ray = Camera.main.ScreenPointToRay(screenPos);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider == playerCollider)
+            {
+                playerAnimator.SetTrigger("BodyHit");
+            }
+        }
     }
 
     public void GoKitchen()

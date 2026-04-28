@@ -26211,6 +26211,7 @@ MonoBehaviour:
   maxRecordTime: 15
   sleepProgressBar: {fileID: 1756576890}
   fillAmount: 0.002
+  playerCollider: {fileID: 831293477}
   wardrobeCamera: {fileID: 1264302741}
   wardrobeButton: {fileID: 2019089349}
   wardrobeUI: {fileID: 274470099}

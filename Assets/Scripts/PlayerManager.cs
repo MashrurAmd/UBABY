@@ -37,6 +37,11 @@ public class PlayerManager : MonoBehaviour
     public Image recordIcon;
     public Color recordIconColor;
     public GameObject sleepParticleEffect;
+    
+    
+    [Header("Sleep Sounds")]
+    public AudioSource sleepSound1;  // drag first sleep sound here
+    public AudioSource sleepSound2;  // drag second sleep sound here
 
     void Start()
     {
@@ -319,16 +324,19 @@ public class PlayerManager : MonoBehaviour
         if (!isSleeping)
         {
             isSleeping = true;
-            playerAnimator.ResetTrigger("Hungry"); // ✅ cancel any pending hungry trigger
+            playerAnimator.ResetTrigger("Hungry");
             playerAnimator.SetBool("Sleep", true);
             sleepButtonText.text = "Wake Up";
             sleepBG.SetActive(true);
             sleepParticleEffect.SetActive(true);
+
+            // ✅ play sleep sounds
+            sleepSound1.Play();
+            sleepSound2.Play();
         }
         else
         {
             WakeUp();
-            sleepParticleEffect.SetActive(false);
         }
     }
 
@@ -338,6 +346,11 @@ public class PlayerManager : MonoBehaviour
         playerAnimator.SetBool("Sleep", false);
         sleepButtonText.text = "Sleep";
         sleepBG.SetActive(false);
+        sleepParticleEffect.SetActive(false);
+
+        // ✅ stop sleep sounds when waking up
+        sleepSound1.Stop();
+        sleepSound2.Stop();
     }
 
     // ===========================

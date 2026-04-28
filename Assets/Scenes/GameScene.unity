@@ -6697,7 +6697,7 @@ Transform:
   m_GameObject: {fileID: 382865396}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.042, z: 0}
+  m_LocalPosition: {x: 0, y: 0.003, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6722,8 +6722,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.15217155, y: 0.10023319, z: 0.2}
-  m_Center: {x: 0.012409138, y: 0.0519245, z: -3.0830255e-11}
+  m_Size: {x: 0.21025684, y: 0.07730329, z: 0.2}
+  m_Center: {x: 0.00313123, y: 0.040459536, z: -5.0777473e-12}
 --- !u!1001 &383011016
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15935,7 +15935,7 @@ Transform:
   m_GameObject: {fileID: 831293475}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.019, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -26212,6 +26212,8 @@ MonoBehaviour:
   sleepProgressBar: {fileID: 1756576890}
   fillAmount: 0.002
   playerCollider: {fileID: 831293477}
+  legCollider: {fileID: 382865398}
+  headCollider: {fileID: 622674655}
   wardrobeCamera: {fileID: 1264302741}
   wardrobeButton: {fileID: 2019089349}
   wardrobeUI: {fileID: 274470099}

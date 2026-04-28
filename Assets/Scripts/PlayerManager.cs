@@ -29,6 +29,9 @@ public class PlayerManager : MonoBehaviour
     
     [Header("Body Hit")]
     public Collider playerCollider; // drag character's collider here
+    public Collider legCollider; // drag leg collider here (optional, for more specific hit detection)
+    public Collider headCollider;
+    
     
     private string wardrobe = "wardrobe";
 
@@ -192,6 +195,14 @@ public class PlayerManager : MonoBehaviour
             if (hit.collider == playerCollider)
             {
                 playerAnimator.SetTrigger("BodyHit");
+            }
+            else if (hit.collider == legCollider)
+            {
+                playerAnimator.SetTrigger("LegHit"); // ✅ leg hit
+            }
+            else if (hit.collider == headCollider)
+            {
+                playerAnimator.SetTrigger("HeadHit"); // ✅ head hit
             }
         }
     }

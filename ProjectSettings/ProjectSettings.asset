@@ -165,6 +165,7 @@ PlayerSettings:
   applicationIdentifier:
     Android: com.UBaby
     Standalone: com.UBaby
+    iPhone: com.UBaby
   buildNumber:
     Standalone: 0
     VisionOS: 0
@@ -570,7 +571,7 @@ PlayerSettings:
   enableCrashReportAPI: 0
   cameraUsageDescription: 
   locationUsageDescription: 
-  microphoneUsageDescription: 
+  microphoneUsageDescription: This app uses the microphone to record your voice
   bluetoothUsageDescription: 
   macOSTargetOSVersion: 10.13.0
   switchNMETAOverride: 

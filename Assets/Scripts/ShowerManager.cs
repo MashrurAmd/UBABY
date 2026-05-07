@@ -66,7 +66,7 @@ public class ShowerManager : MonoBehaviour
         if (isClean)
         {
             dirtyElapsed += Time.deltaTime;
-            Debug.Log($"Dirty timer: {dirtyElapsed}/{dirtyTimer}"); // remove after fix
+            //Debug.Log($"Dirty timer: {dirtyElapsed}/{dirtyTimer}"); // remove after fix
             if (dirtyElapsed >= dirtyTimer)
             {
                 SetDirty();

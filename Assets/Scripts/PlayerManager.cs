@@ -26,29 +26,28 @@ public class PlayerManager : MonoBehaviour
     public Image sleepProgressBar;
     public float fillAmount;
 
-    
     [Header("Body Hit")]
-    public Collider playerCollider; // drag character's collider here
-    public Collider legCollider; // drag leg collider here (optional, for more specific hit detection)
+    public Collider playerCollider;
+    public Collider legCollider;
     public Collider headCollider;
-    
-    
-    private string wardrobe = "wardrobe";
 
+    private string wardrobe = "wardrobe";
     public Transform wardrobeCamera;
     public GameObject wardrobeButton;
-    public GameObject wardrobeUI; // your clothes changing UI
+    public GameObject wardrobeUI;
 
-    AudioSource audioSource;
+    public AudioSource recordingAudioSource;
     public Text recordText;
     public Image recordIcon;
     public Color recordIconColor;
     public GameObject sleepParticleEffect;
-    
-    
+
     [Header("Sleep Sounds")]
-    public AudioSource sleepSound1;  // drag first sleep sound here
-    public AudioSource sleepSound2;  // drag second sleep sound here
+    public AudioSource sleepSound1;
+    public AudioSource sleepSound2;
+
+    // ✅ track actual recorded samples
+    private int recordedSamples = 0;
 
     void Start()
     {
@@ -64,20 +63,15 @@ public class PlayerManager : MonoBehaviour
 
     void Update()
     {
-        
-        // ✅ Body hit detection - add at the very top
+        // ✅ Body hit detection
         if (Input.GetMouseButtonDown(0))
-        {
             CheckBodyHit(Input.mousePosition);
-        }
 
 #if !UNITY_EDITOR
-    if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
-    {
-        CheckBodyHit(Input.GetTouch(0).position);
-    }
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+            CheckBodyHit(Input.GetTouch(0).position);
 #endif
-        
+
         if (isRecording)
         {
             _elapsed += Time.deltaTime;
@@ -144,21 +138,16 @@ public class PlayerManager : MonoBehaviour
         currentRoom = office;
         UpdateRoomCamera();
 
-        // ✅ Restore bottom nav buttons
         officeButton.SetActive(true);
         kitchenButton.SetActive(true);
         showerButton.SetActive(true);
         bedRommButtom.SetActive(true);
         wardrobeButton.SetActive(true);
-
-        wardrobeUI.SetActive(false); // ✅ hide wardrobe UI
+        wardrobeUI.SetActive(false);
 
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
-        currentRoom = office;
         playerAnimator.SetBool("isinShower", false);
-
-        
 
         myCamera.position = officeCamera.position;
         myCamera.rotation = officeCamera.rotation;
@@ -174,37 +163,6 @@ public class PlayerManager : MonoBehaviour
         kitchenButton.GetComponent<Image>().enabled = false;
         showerButton.GetComponent<Image>().enabled = false;
         bedRommButtom.GetComponent<Image>().enabled = false;
-
-        wardrobeUI.SetActive(false); // add this line in GoOffice, GoKitchen, GoShower, GoBedroom
-    }
-    
-    // ===========================
-// 👊 BODY HIT
-// ===========================
-
-    void CheckBodyHit(Vector2 screenPos)
-    {
-        // ✅ Don't trigger if sleeping or recording
-        if (isSleeping || isRecording) return;
-
-        Ray ray = Camera.main.ScreenPointToRay(screenPos);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit))
-        {
-            if (hit.collider == playerCollider)
-            {
-                playerAnimator.SetTrigger("BodyHit");
-            }
-            else if (hit.collider == legCollider)
-            {
-                playerAnimator.SetTrigger("LegHit"); // ✅ leg hit
-            }
-            else if (hit.collider == headCollider)
-            {
-                playerAnimator.SetTrigger("HeadHit"); // ✅ head hit
-            }
-        }
     }
 
     public void GoKitchen()
@@ -217,14 +175,10 @@ public class PlayerManager : MonoBehaviour
         showerButton.SetActive(true);
         bedRommButtom.SetActive(true);
         wardrobeButton.SetActive(true);
-
         wardrobeUI.SetActive(false);
-
 
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
-        currentRoom = kitchen;
-
         playerAnimator.SetBool("isinShower", false);
 
         myCamera.position = kitchenCamera.position;
@@ -246,24 +200,18 @@ public class PlayerManager : MonoBehaviour
 
     public void GoShower()
     {
-
         currentRoom = shower;
         UpdateRoomCamera();
-
 
         officeButton.SetActive(true);
         kitchenButton.SetActive(true);
         showerButton.SetActive(true);
         bedRommButtom.SetActive(true);
         wardrobeButton.SetActive(true);
-
         wardrobeUI.SetActive(false);
 
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
-        currentRoom = shower;
-
-        // Add animation for shower transition
         playerAnimator.SetBool("isinShower", true);
 
         myCamera.position = showerCamera.position;
@@ -281,20 +229,10 @@ public class PlayerManager : MonoBehaviour
         kitchenButton.GetComponent<Image>().enabled = false;
         showerButton.GetComponent<Image>().enabled = true;
         bedRommButtom.GetComponent<Image>().enabled = false;
-
-        wardrobeUI.SetActive(false); // add this line in GoOffice, GoKitchen, GoShower, GoBedroom
-
-        if (currentRoom != shower)
-            playerAnimator.SetBool("isinShower", false);
-        
-
-
-
     }
 
     public void GoBedroom()
     {
-
         currentRoom = bedroom;
         UpdateRoomCamera();
 
@@ -303,12 +241,10 @@ public class PlayerManager : MonoBehaviour
         showerButton.SetActive(true);
         bedRommButtom.SetActive(true);
         wardrobeButton.SetActive(true);
-
         wardrobeUI.SetActive(false);
 
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
-        currentRoom = bedroom;
         playerAnimator.SetBool("isinShower", false);
 
         myCamera.position = bedroomCamera.position;
@@ -324,7 +260,41 @@ public class PlayerManager : MonoBehaviour
         kitchenButton.GetComponent<Image>().enabled = false;
         showerButton.GetComponent<Image>().enabled = false;
         bedRommButtom.GetComponent<Image>().enabled = true;
-        wardrobeUI.SetActive(false); // add this line in GoOffice, GoKitchen, GoShower, GoBedroom
+    }
+
+    public void GoWardrobe()
+    {
+        currentRoom = wardrobe;
+        UpdateRoomCamera();
+
+        switchAudio.Play();
+        player.transform.parent = myCamera.transform;
+
+        myCamera.position = wardrobeCamera.position;
+        myCamera.rotation = wardrobeCamera.rotation;
+
+        openFridgeButton.SetActive(false);
+        closeFridgeButton.SetActive(false);
+        storeManager.availableProductsUI.SetActive(false);
+        showerBottomUI.SetActive(false);
+        sleepButton.SetActive(false);
+        wardrobeUI.SetActive(true);
+        WakeUp();
+
+        officeButton.SetActive(false);
+        kitchenButton.SetActive(false);
+        showerButton.SetActive(false);
+        bedRommButtom.SetActive(false);
+        wardrobeButton.SetActive(false);
+    }
+
+    void UpdateRoomCamera()
+    {
+        officeCamera.gameObject.SetActive(currentRoom == office);
+        kitchenCamera.gameObject.SetActive(currentRoom == kitchen);
+        showerCamera.gameObject.SetActive(currentRoom == shower);
+        bedroomCamera.gameObject.SetActive(currentRoom == bedroom);
+        wardrobeCamera.gameObject.SetActive(currentRoom == wardrobe);
     }
 
     // ===========================
@@ -337,11 +307,9 @@ public class PlayerManager : MonoBehaviour
         fridgeRightDoorAnimator.SetBool("Open", true);
         fridgeLeftDoorAnimator.SetBool("Open", true);
         openFridgeButton.SetActive(false);
-        //closeFridgeButton.SetActive(true);
         myCameraController.moveBack = false;
         myCameraController.moveToFridge = true;
         StartCoroutine(OpenStoreWithDelay(0.6f));
-        //storeManager.StoreIsOpen();
 
         IEnumerator OpenStoreWithDelay(float delay)
         {
@@ -350,8 +318,6 @@ public class PlayerManager : MonoBehaviour
             closeFridgeButton.SetActive(true);
         }
     }
-
-
 
     public void CloseFridge()
     {
@@ -369,6 +335,7 @@ public class PlayerManager : MonoBehaviour
     // ===========================
 
     public bool isSleeping;
+
     public void Sleep()
     {
         if (!isSleeping)
@@ -379,8 +346,6 @@ public class PlayerManager : MonoBehaviour
             sleepButtonText.text = "Wake Up";
             sleepBG.SetActive(true);
             sleepParticleEffect.SetActive(true);
-
-            // ✅ play sleep sounds
             sleepSound1.Play();
             sleepSound2.Play();
         }
@@ -397,10 +362,30 @@ public class PlayerManager : MonoBehaviour
         sleepButtonText.text = "Sleep";
         sleepBG.SetActive(false);
         sleepParticleEffect.SetActive(false);
-
-        // ✅ stop sleep sounds when waking up
         sleepSound1.Stop();
         sleepSound2.Stop();
+    }
+
+    // ===========================
+    // 👊 BODY HIT
+    // ===========================
+
+    void CheckBodyHit(Vector2 screenPos)
+    {
+        if (isSleeping || isRecording) return;
+
+        Ray ray = Camera.main.ScreenPointToRay(screenPos);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider == playerCollider)
+                playerAnimator.SetTrigger("BodyHit");
+            else if (hit.collider == legCollider)
+                playerAnimator.SetTrigger("LegHit");
+            else if (hit.collider == headCollider)
+                playerAnimator.SetTrigger("HeadHit");
+        }
     }
 
     // ===========================
@@ -409,14 +394,20 @@ public class PlayerManager : MonoBehaviour
 
     public void Record()
     {
-        audioSource = GetComponent<AudioSource>();
         if (!isRecording)
         {
             isRecording = true;
-            audioSource.clip = Microphone.Start("", false, maxRecordTime, 44100);
+            _elapsed = 0;
+
+            Debug.Log("🎤 Available microphones:");
+            foreach (string device in Microphone.devices)
+                Debug.Log("   - " + device);
+
+            recordingAudioSource.clip = Microphone.Start("", false, maxRecordTime, 44100);
             recordText.text = "No";
             recordIcon.color = Color.red;
             playerAnimator.SetBool("Listening", true);
+            Debug.Log("🎤 Recording STARTED");
         }
         else
         {
@@ -427,14 +418,75 @@ public class PlayerManager : MonoBehaviour
     void PlayRecordingAudio()
     {
         isRecording = false;
-        StartCoroutine(StopTalkingAnimation(_elapsed * 0.75f));
-        _elapsed = 0;
+
+        // ✅ capture actual recorded position BEFORE stopping
+        recordedSamples = Microphone.GetPosition("");
+        Debug.Log("🎤 Recorded samples: " + recordedSamples);
+
         Microphone.End("");
-        audioSource.Play();
+        _elapsed = 0;
+
         recordIcon.color = recordIconColor;
         recordText.text = "Yes";
         playerAnimator.SetBool("Listening", false);
         playerAnimator.SetBool("Talking", true);
+
+        StartCoroutine(PlayAfterMicReady());
+    }
+
+    IEnumerator PlayAfterMicReady()
+    {
+        // wait until mic fully stops
+        while (Microphone.IsRecording(""))
+            yield return null;
+
+        yield return null;
+
+        if (recordingAudioSource == null || recordingAudioSource.clip == null)
+        {
+            Debug.LogError("❌ AudioSource or clip is NULL!");
+            yield break;
+        }
+
+        if (recordedSamples <= 0)
+        {
+            Debug.LogError("❌ No samples recorded!");
+            yield break;
+        }
+
+        // ✅ Trim to actual recorded length
+        AudioClip trimmedClip = TrimClip(recordingAudioSource.clip, recordedSamples);
+        recordingAudioSource.clip = trimmedClip;
+
+        Debug.Log("🔊 Trimmed clip length: " + trimmedClip.length + "s");
+
+        recordingAudioSource.outputAudioMixerGroup = null;
+        recordingAudioSource.spatialBlend = 0f;
+        recordingAudioSource.volume = 1f;
+        recordingAudioSource.Play();
+
+        Debug.Log("▶️ Playing audio!");
+
+        // ✅ stop talking animation after clip finishes
+        StartCoroutine(StopTalkingAnimation(trimmedClip.length * 0.75f));
+    }
+
+    AudioClip TrimClip(AudioClip clip, int samples)
+    {
+        if (samples <= 0) return clip;
+
+        float[] data = new float[samples * clip.channels];
+        clip.GetData(data, 0);
+
+        AudioClip trimmed = AudioClip.Create(
+            "RecordedAudio",
+            samples,
+            clip.channels,
+            clip.frequency,
+            false
+        );
+        trimmed.SetData(data, 0);
+        return trimmed;
     }
 
     IEnumerator StopTalkingAnimation(float wait)
@@ -443,19 +495,19 @@ public class PlayerManager : MonoBehaviour
         playerAnimator.SetBool("Talking", false);
     }
 
-  
-    
-    //switch left and right
+    // ===========================
+    // 🔄 SWITCH ROOMS
+    // ===========================
 
     public void SwitchRight()
     {
         switch (currentRoom)
         {
-            case "office":   GoKitchen();   break;
-            case "kitchen":  GoShower();    break;
-            case "shower":   GoBedroom();   break;
-            case "bedroom":  GoWardrobe();  break; // ✅
-            case "wardrobe": GoOffice();    break; // ✅
+            case "office":   GoKitchen();  break;
+            case "kitchen":  GoShower();   break;
+            case "shower":   GoBedroom();  break;
+            case "bedroom":  GoWardrobe(); break;
+            case "wardrobe": GoOffice();   break;
         }
     }
 
@@ -463,54 +515,11 @@ public class PlayerManager : MonoBehaviour
     {
         switch (currentRoom)
         {
-            case "office":   GoWardrobe();  break; // ✅
-            case "kitchen":  GoOffice();    break;
-            case "shower":   GoKitchen();   break;
-            case "bedroom":  GoShower();    break;
-            case "wardrobe": GoBedroom();   break; // ✅
+            case "office":   GoWardrobe(); break;
+            case "kitchen":  GoOffice();   break;
+            case "shower":   GoKitchen();  break;
+            case "bedroom":  GoShower();   break;
+            case "wardrobe": GoBedroom();  break;
         }
     }
-
-    public void GoWardrobe()
-        {
-
-            currentRoom = wardrobe;
-            UpdateRoomCamera();
-
-
-            switchAudio.Play();
-            player.transform.parent = myCamera.transform;
-            currentRoom = wardrobe;
-
-            myCamera.position = wardrobeCamera.position;
-            myCamera.rotation = wardrobeCamera.rotation;
-
-            openFridgeButton.SetActive(false);
-            closeFridgeButton.SetActive(false);
-            storeManager.availableProductsUI.SetActive(false);
-            showerBottomUI.SetActive(false);
-            sleepButton.SetActive(false);
-            wardrobeUI.SetActive(true);
-            WakeUp();
-
-            // ✅ Hide bottom nav buttons
-            officeButton.SetActive(false);
-            kitchenButton.SetActive(false);
-            showerButton.SetActive(false);
-            bedRommButtom.SetActive(false);
-            wardrobeButton.SetActive(false);
-        }
-
-    void UpdateRoomCamera()
-    {
-        officeCamera.gameObject.SetActive(currentRoom == office);
-        kitchenCamera.gameObject.SetActive(currentRoom == kitchen);
-        showerCamera.gameObject.SetActive(currentRoom == shower);
-        bedroomCamera.gameObject.SetActive(currentRoom == bedroom);
-        wardrobeCamera.gameObject.SetActive(currentRoom == wardrobe);
-
-        // optional: disable main camera
-        //myCamera.gameObject.SetActive(false);
-    }
-
 }

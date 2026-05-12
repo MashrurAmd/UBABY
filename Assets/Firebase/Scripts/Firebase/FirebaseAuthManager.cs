@@ -50,7 +50,6 @@ public class FirebaseAuthManager : MonoBehaviour
         AuthStateChanged(this, null);
     }
 
-    // Track state changes of the auth object.
     void AuthStateChanged(object sender, System.EventArgs eventArgs)
     {
         if (auth.CurrentUser != user)
@@ -104,18 +103,38 @@ public class FirebaseAuthManager : MonoBehaviour
                 case AuthError.MissingPassword:
                     failedMessage += "Password is missing";
                     break;
+                case AuthError.UserNotFound:
+                    failedMessage += "Account not found";
+                    break;
                 default:
-                    failedMessage = "Login Failed";
+                    // Firebase sometimes wraps wrong password as a generic internal error
+                    // so we check the message string as a fallback
+                    string errorMsg = firebaseException.Message.ToLower();
+
+                    if (errorMsg.Contains("invalid_password") || errorMsg.Contains("wrong password"))
+                        failedMessage += "Wrong Password";
+                    else if (errorMsg.Contains("invalid_login_credentials") || errorMsg.Contains("invalid login credentials"))
+                        failedMessage += "Invalid email or password";
+                    else if (errorMsg.Contains("too_many_attempts_try_later"))
+                        failedMessage += "Too many failed attempts. Try again later";
+                    else if (errorMsg.Contains("user_not_found"))
+                        failedMessage += "Account not found";
+                    else
+                    {
+                        // Temporary: log the exact message so you can see what Firebase is returning
+                        Debug.Log("Unhandled Firebase error: " + firebaseException.Message);
+                        failedMessage = "Login Failed. Please try again";
+                    }
                     break;
             }
 
-            Debug.Log(failedMessage);
+            UIManager.Instance.ShowLoginMessage(failedMessage, isError: true);
         }
         else
         {
-            user = loginTask.Result.User;   // FIX HERE
+            user = loginTask.Result.User;
 
-            Debug.LogFormat("{0} You Are Successfully Logged In", user.DisplayName);
+            UIManager.Instance.ShowLoginMessage("Welcome, " + user.DisplayName + "! Logged in successfully.", isError: false);
 
             References.userName = user.DisplayName;
             UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
@@ -132,15 +151,15 @@ public class FirebaseAuthManager : MonoBehaviour
     {
         if (name == "")
         {
-            Debug.LogError("User Name is empty");
+            UIManager.Instance.ShowRegistrationMessage("User Name is empty", isError: true);
         }
         else if (email == "")
         {
-            Debug.LogError("email field is empty");
+            UIManager.Instance.ShowRegistrationMessage("Email field is empty", isError: true);
         }
         else if (password != confirmPassword)
         {
-            Debug.LogError("Password does not match");
+            UIManager.Instance.ShowRegistrationMessage("Password does not match", isError: true);
         }
         else
         {
@@ -174,11 +193,11 @@ public class FirebaseAuthManager : MonoBehaviour
                         break;
                 }
 
-                Debug.Log(failedMessage);
+                UIManager.Instance.ShowRegistrationMessage(failedMessage, isError: true);
             }
             else
             {
-                user = registerTask.Result.User;   //  FIX HERE
+                user = registerTask.Result.User;
 
                 UserProfile userProfile = new UserProfile { DisplayName = name };
                 var updateProfileTask = user.UpdateUserProfileAsync(userProfile);
@@ -192,7 +211,7 @@ public class FirebaseAuthManager : MonoBehaviour
                     FirebaseException firebaseException = updateProfileTask.Exception.GetBaseException() as FirebaseException;
                     AuthError authError = (AuthError)firebaseException.ErrorCode;
 
-                    string failedMessage = "Profile update Failed! Because ";
+                    string failedMessage = "Profile Update Failed! Because ";
                     switch (authError)
                     {
                         case AuthError.InvalidEmail:
@@ -215,11 +234,11 @@ public class FirebaseAuthManager : MonoBehaviour
                             break;
                     }
 
-                    Debug.Log(failedMessage);
+                    UIManager.Instance.ShowRegistrationMessage(failedMessage, isError: true);
                 }
                 else
                 {
-                    Debug.Log("Registration Successful Welcome " + user.DisplayName);
+                    UIManager.Instance.ShowRegistrationMessage("Welcome " + user.DisplayName + "! Registration Successful.", isError: false);
                     UIManager.Instance.OpenLoginPanel();
                 }
             }

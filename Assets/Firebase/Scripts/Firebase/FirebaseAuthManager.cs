@@ -130,14 +130,23 @@ public class FirebaseAuthManager : MonoBehaviour
 
             UIManager.Instance.ShowLoginMessage(failedMessage, isError: true);
         }
+        //else
+        //{
+        //    user = loginTask.Result.User;
+
+        //    UIManager.Instance.ShowLoginMessage("Welcome, " + user.DisplayName + "! Logged in successfully.", isError: false);
+
+        //    References.userName = user.DisplayName;
+        //    UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
+        //}
         else
         {
             user = loginTask.Result.User;
-
             UIManager.Instance.ShowLoginMessage("Welcome, " + user.DisplayName + "! Logged in successfully.", isError: false);
-
             References.userName = user.DisplayName;
-            UnityEngine.SceneManagement.SceneManager.LoadScene("GameScene");
+
+            // ✅ Fill slider then load scene
+            yield return StartCoroutine(UIManager.Instance.FillSliderAndLoad("GameScene"));
         }
     }
 

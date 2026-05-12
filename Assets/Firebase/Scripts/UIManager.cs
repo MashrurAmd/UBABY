@@ -91,7 +91,7 @@ public class UIManager : MonoBehaviour
     {
         ShowLoadingSlider();
 
-        float duration = 2f; // ✅ how long to fill the slider
+        float duration = 5f; // ✅ how long to fill the slider
         float elapsed = 0f;
 
         while (elapsed < duration)

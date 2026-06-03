@@ -26501,7 +26501,7 @@ MonoBehaviour:
   popupText: {fileID: 1267217851}
   popupAudio: {fileID: 1222887172}
   hungryClip: {fileID: 8300000, guid: fca9f6253f683504d940b1cb919b3472, type: 3}
-  sleepClip: {fileID: 8300000, guid: 34f894adb44f3674b8a83f1d85027860, type: 3}
+  sleepClip: {fileID: 8300000, guid: da3771c9a3260c8459b8be6e48d1817f, type: 3}
   showerClip: {fileID: 8300000, guid: ea674ed154d7c1b43862e78c63f74f6c, type: 3}
   fullClip: {fileID: 8300000, guid: fda64fde6e152394aaab09423e61f6b3, type: 3}
   popupMoveOffset: {x: 0, y: 40, z: 0}

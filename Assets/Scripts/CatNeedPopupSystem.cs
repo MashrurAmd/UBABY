@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class CatNeedsPopup : MonoBehaviour
 {
@@ -35,76 +37,80 @@ public class CatNeedsPopup : MonoBehaviour
         StartCoroutine(NeedsRoutine());
     }
 
-    IEnumerator NeedsRoutine()
+IEnumerator NeedsRoutine()
+{
+    while (true)
     {
-        while (true)
+        if (playerManager.playerAnimator.GetBool("Talking") ||
+            playerManager.playerAnimator.GetBool("Listening"))
         {
-            if (playerManager.playerAnimator.GetBool("Talking") ||
-                playerManager.playerAnimator.GetBool("Listening"))
-            {
-                yield return null;
-                continue;
-            }
-
-            if (!popupActive)
-            {
-                // --- HUNGER ---
-                if (storeManager.kitchenProgressBar.fillAmount < hungerThreshold)
-                {
-                    popupActive = true;
-                    yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
-                    ShowPopup("I am hungry 😿", hungryClip);
-
-                    // ✅ Only trigger animation if cooldown has passed
-                    if (Time.time - lastHungryAnimTime >= hungryCooldown)
-                    {
-                        playerAnimator.SetTrigger("Hungry");
-                        lastHungryAnimTime = Time.time; // ✅ update last trigger time
-                    }
-
-                    popupActive = false;
-                }
-                else if (storeManager.kitchenProgressBar.fillAmount >= 1f)
-                {
-                    popupActive = true;
-                    ShowPopup("I am full 😺", fullClip, false);
-                    popupActive = false;
-                }
-
-                // --- SLEEP ---
-                else if (playerManager.sleepProgressBar.fillAmount < sleepThreshold)
-                {
-                    popupActive = true;
-                    yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
-                    ShowPopup("I want to sleep 💤", sleepClip);
-                    popupActive = false;
-                }
-                else if (playerManager.sleepProgressBar.fillAmount >= 1f)
-                {
-                    popupActive = true;
-                    ShowPopup("Sleep done 😴", fullClip, false);
-                    popupActive = false;
-                }
-
-                // --- SHOWER ---
-                else if (showerManager.showerProgressImage.fillAmount < showerThreshold)
-                {
-                    popupActive = true;
-                    yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
-                    ShowPopup("I need shower 🚿", showerClip);
-                    popupActive = false;
-                }
-                else if (showerManager.showerProgressImage.fillAmount >= 1f)
-                {
-                    popupActive = true;
-                    ShowPopup("Shower done 🚿", fullClip, false);
-                    popupActive = false;
-                }
-            }
-
             yield return null;
+            continue;
         }
+
+        if (!popupActive)
+        {
+            // --- HUNGER --- ✅ runs independently
+            if (storeManager.kitchenProgressBar.fillAmount < hungerThreshold)
+            {
+                popupActive = true;
+                yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
+                ShowPopup("I am hungry 😿", hungryClip);
+
+                if (Time.time - lastHungryAnimTime >= hungryCooldown)
+                {
+                    playerAnimator.SetTrigger("Hungry");
+                    lastHungryAnimTime = Time.time;
+                }
+                popupActive = false;
+            }
+
+            // --- SLEEP --- ✅ runs independently
+            if (playerManager.sleepProgressBar.fillAmount < sleepThreshold)
+            {
+                popupActive = true;
+                yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
+                ShowPopup("I want to sleep 💤", sleepClip);
+                popupActive = false;
+            }
+
+            // --- SHOWER --- ✅ runs independently
+            if (showerManager.showerProgressImage.fillAmount < showerThreshold)
+            {
+                popupActive = true;
+                yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
+                ShowPopup("I need shower 🚿", showerClip);
+                popupActive = false;
+            }
+
+            // --- FULL --- ✅
+            if (storeManager.kitchenProgressBar.fillAmount >= 1f)
+            {
+                popupActive = true;
+                ShowPopup("I am full 😺", fullClip, false);
+                popupActive = false;
+            }
+
+            // --- SLEEP DONE --- ✅
+            if (playerManager.sleepProgressBar.fillAmount >= 1f)
+            {
+                popupActive = true;
+                ShowPopup("Sleep done 😴", fullClip, false);
+                popupActive = false;
+            }
+
+            // --- SHOWER DONE --- ✅
+            if (showerManager.showerProgressImage.fillAmount >= 1f)
+            {
+                popupActive = true;
+                ShowPopup("Shower done 🚿", fullClip, false);
+                popupActive = false;
+            }
+        }
+
+        yield return null;
     }
+}
 
     void ShowPopup(string msg, AudioClip clip, bool allowAnimation = true)
     {

@@ -8,6 +8,7 @@ TagManager:
   - Body
   - Leg
   - BodyHit
+  - Basket
   layers:
   - Default
   - TransparentFX

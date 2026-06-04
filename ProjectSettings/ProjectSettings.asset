@@ -836,9 +836,23 @@ PlayerSettings:
     14: 
     4: USE_ADMOB_PATCH
     7: USE_ADMOB;USE_ADMOB_PATCH
-    Android: USE_ADMOB;USE_ADMOB_PATCH
-    Windows Store Apps: 
-    iPhone: USE_ADMOB_PATCH
+    Android: USE_ADMOB;USE_ADMOB_PATCH;DOTWEEN
+    EmbeddedLinux: DOTWEEN
+    GameCoreScarlett: DOTWEEN
+    GameCoreXboxOne: DOTWEEN
+    LinuxHeadlessSimulation: DOTWEEN
+    Nintendo Switch: DOTWEEN
+    PS4: DOTWEEN
+    PS5: DOTWEEN
+    QNX: DOTWEEN
+    Stadia: DOTWEEN
+    Standalone: DOTWEEN
+    VisionOS: DOTWEEN
+    WebGL: DOTWEEN
+    Windows Store Apps: DOTWEEN
+    XboxOne: DOTWEEN
+    iPhone: USE_ADMOB_PATCH;DOTWEEN
+    tvOS: DOTWEEN
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

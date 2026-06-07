@@ -145,8 +145,8 @@ public class FirebaseAuthManager : MonoBehaviour
             UIManager.Instance.ShowLoginMessage("Welcome, " + user.DisplayName + "! Logged in successfully.", isError: false);
             References.userName = user.DisplayName;
 
-            // ✅ Fill slider then load scene
-            yield return StartCoroutine(UIManager.Instance.FillSliderAndLoad("GameScene"));
+            // ✅ Play video then load scene
+            yield return StartCoroutine(UIManager.Instance.PlayVideoAndLoad("GameScene"));
         }
     }
 

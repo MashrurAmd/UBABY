@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Video; // ✅ add this
 
 public class UIManager : MonoBehaviour
 {
@@ -14,9 +15,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text loginOutputText;
     [SerializeField] private Text registrationOutputText;
 
-    [Header("Loading Slider")]
-    [SerializeField] private GameObject loadingSliderObject; // parent object to show/hide
-    [SerializeField] private Slider loadingSlider;           // the slider itself
+    [Header("Loading Video")]
+    [SerializeField] private GameObject loadingPanel;    // panel that shows during loading
+    [SerializeField] private VideoPlayer loadingVideo;   // video player component
 
     private void Awake()
     {
@@ -64,46 +65,31 @@ public class UIManager : MonoBehaviour
     }
 
     // ===========================
-    // ⏳ LOADING SLIDER
+    // 🎬 LOADING VIDEO
     // ===========================
 
-    public void ShowLoadingSlider()
+// ✅ ADD THIS INSTEAD
+    public IEnumerator PlayVideoAndLoad(string sceneName)
     {
-        if (loadingSliderObject != null)
-            loadingSliderObject.SetActive(true);
-        if (loadingSlider != null)
-            loadingSlider.value = 0f;
-    }
+        loadingPanel.SetActive(true);
+        loginPanel.SetActive(false);
 
-    public void HideLoadingSlider()
-    {
-        if (loadingSliderObject != null)
-            loadingSliderObject.SetActive(false);
-    }
+        yield return null;
 
-    public void SetSliderValue(float value)
-    {
-        if (loadingSlider != null)
-            loadingSlider.value = value;
-    }
+        loadingVideo.Stop();
+        loadingVideo.time = 0;
 
-    public IEnumerator FillSliderAndLoad(string sceneName)
-    {
-        ShowLoadingSlider();
+        loadingVideo.Prepare();
+        Debug.Log("🎬 Preparing video...");
 
-        float duration = 5f; // ✅ how long to fill the slider
-        float elapsed = 0f;
+        yield return new WaitUntil(() => loadingVideo.isPrepared);
+        Debug.Log("🎬 Video prepared!");
 
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float progress = Mathf.Clamp01(elapsed / duration);
-            SetSliderValue(progress);
-            yield return null;
-        }
+        loadingVideo.Play();
+        Debug.Log("🎬 Video playing!");
 
-        SetSliderValue(1f);
-        yield return new WaitForSeconds(0.2f); // ✅ small pause at full
+        yield return new WaitUntil(() => !loadingVideo.isPlaying);
+        Debug.Log("🎬 Video finished!");
 
         UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
     }

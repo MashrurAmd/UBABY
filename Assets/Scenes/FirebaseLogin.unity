@@ -1442,9 +1442,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GoogleAPI: 843319817240-a3kd2bdvlsmd644o2gsdtf0fcffkrl5s.apps.googleusercontent.com
-  Username: {fileID: 0}
-  UserEmail: {fileID: 0}
-  UserProfilePic: {fileID: 0}
 --- !u!4 &762575209
 Transform:
   m_ObjectHideFlags: 0
@@ -3641,6 +3638,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dependencyStatus: 0
+  googleWebClientId: 843319817240-a3kd2bdvlsmd644o2gsdtf0fcffkrl5s.apps.googleusercontent.com
   emailLoginField: {fileID: 896712346}
   passwordLoginField: {fileID: 1577326456}
   nameRegisterField: {fileID: 1781917333}
@@ -4174,9 +4172,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 762575208}
-        m_TargetAssemblyTypeName: LoginWithGoogle, Assembly-CSharp
-        m_MethodName: Login
+      - m_Target: {fileID: 1585835429}
+        m_TargetAssemblyTypeName: FirebaseAuthManager, Assembly-CSharp
+        m_MethodName: LoginWithGoogle
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

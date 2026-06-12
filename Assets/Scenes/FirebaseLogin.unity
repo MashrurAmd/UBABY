@@ -1412,6 +1412,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 675038198}
   m_CullTransparentMesh: 0
+--- !u!1 &762575207
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 762575209}
+  - component: {fileID: 762575208}
+  m_Layer: 0
+  m_Name: Google
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &762575208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 762575207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb9ada47a6fbef0449f415cf991b66af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GoogleAPI: 843319817240-a3kd2bdvlsmd644o2gsdtf0fcffkrl5s.apps.googleusercontent.com
+  Username: {fileID: 0}
+  UserEmail: {fileID: 0}
+  UserProfilePic: {fileID: 0}
+--- !u!4 &762575209
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 762575207}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 595.3241, y: 1113.7972, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &770145239
 GameObject:
   m_ObjectHideFlags: 0
@@ -1979,7 +2027,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.647995, y: 0.65460205}
+  m_AnchoredPosition: {x: 0.6479492, y: 0.654541}
   m_SizeDelta: {x: -1.9201, y: -578.6328}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1043464339
@@ -4126,8 +4174,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1585835429}
-        m_TargetAssemblyTypeName: FirebaseAuthManager, Assembly-CSharp
+      - m_Target: {fileID: 762575208}
+        m_TargetAssemblyTypeName: LoginWithGoogle, Assembly-CSharp
         m_MethodName: Login
         m_Mode: 1
         m_Arguments:
@@ -4438,3 +4486,4 @@ SceneRoots:
   - {fileID: 1822749393}
   - {fileID: 469082827}
   - {fileID: 1585835430}
+  - {fileID: 762575209}

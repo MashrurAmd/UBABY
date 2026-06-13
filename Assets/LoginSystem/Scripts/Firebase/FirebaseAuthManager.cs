@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -32,9 +32,14 @@ public class FirebaseAuthManager : MonoBehaviour
     public InputField passwordRegisterField;
     public InputField confirmPasswordRegisterField;
 
-    // --- Threading & Initialization Management ---
+    // --- Internal ---
     private bool isGoogleSignInInitialized = false;
+    private bool firebaseReady = false;
     private readonly Queue<Action> mainThreadExecutionQueue = new Queue<Action>();
+
+    // =========================================================================
+    // --- INITIALIZATION ---
+    // =========================================================================
 
     private void Awake()
     {
@@ -44,24 +49,24 @@ public class FirebaseAuthManager : MonoBehaviour
 
             if (dependencyStatus == DependencyStatus.Available)
             {
-                InitializeFirebase();
+                EnqueueOnMainThread(() =>
+                {
+                    InitializeFirebase();
+                });
             }
             else
             {
-                Debug.LogError("Could not resolve all firebase dependencies: " + dependencyStatus);
+                Debug.LogError("Could not resolve all Firebase dependencies: " + dependencyStatus);
             }
         });
     }
 
     private void Update()
     {
-        // Executes multi-threaded Firebase/Google background tasks back safely onto the Unity Main Thread
         lock (mainThreadExecutionQueue)
         {
             while (mainThreadExecutionQueue.Count > 0)
-            {
                 mainThreadExecutionQueue.Dequeue().Invoke();
-            }
         }
     }
 
@@ -69,7 +74,10 @@ public class FirebaseAuthManager : MonoBehaviour
     {
         auth = FirebaseAuth.DefaultInstance;
         auth.StateChanged += AuthStateChanged;
-        AuthStateChanged(this, null);
+        firebaseReady = true;
+
+        // Start the auto-login coroutine now that Firebase is ready on the main thread
+        StartCoroutine(AutoLoginCoroutine());
     }
 
     private void AuthStateChanged(object sender, EventArgs eventArgs)
@@ -79,16 +87,12 @@ public class FirebaseAuthManager : MonoBehaviour
             bool signedIn = user != auth.CurrentUser && auth.CurrentUser != null;
 
             if (!signedIn && user != null)
-            {
-                Debug.Log("Signed out " + user.UserId);
-            }
+                Debug.Log("Signed out: " + user.UserId);
 
             user = auth.CurrentUser;
 
             if (signedIn)
-            {
-                Debug.Log("Signed in " + user.UserId);
-            }
+                Debug.Log("Signed in: " + user.UserId);
         }
     }
 
@@ -101,7 +105,60 @@ public class FirebaseAuthManager : MonoBehaviour
     }
 
     // =========================================================================
-    // --- GOOGLE SIGN-IN SYSTEM ---
+    // --- AUTO-LOGIN ON LAUNCH ---
+    // =========================================================================
+
+    /// <summary>
+    /// Waits for Firebase to restore its cached auth session (up to a short
+    /// timeout), then decides whether to jump to GameScene or stay on LoginScene.
+    ///
+    /// Why a coroutine?  Firebase restores its persistent token asynchronously
+    /// after CheckAndFixDependencies completes. auth.CurrentUser can be null for
+    /// a few frames even when the user IS still authenticated. Polling with a
+    /// timeout gives the SDK time to hydrate the session before we decide.
+    /// </summary>
+    private IEnumerator AutoLoginCoroutine()
+    {
+        // No saved login on this device → stay on login screen immediately
+        if (!LoginSaveManager.HasSavedLogin())
+        {
+            Debug.Log("[AutoLogin] No saved login. Showing login screen.");
+            yield break;
+        }
+
+        Debug.Log("[AutoLogin] Saved login found. Waiting for Firebase session restore...");
+
+        // Wait up to 3 seconds for Firebase to restore the cached token
+        float timeout = 3f;
+        float elapsed = 0f;
+
+        while (auth.CurrentUser == null && elapsed < timeout)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (auth.CurrentUser != null)
+        {
+            // Firebase confirmed the session is still valid
+            string displayName = string.IsNullOrEmpty(auth.CurrentUser.DisplayName)
+                ? LoginSaveManager.SavedDisplayName
+                : auth.CurrentUser.DisplayName;
+
+            Debug.Log($"[AutoLogin] Session restored for {displayName}. Going to GameScene.");
+            References.userName = displayName;
+            StartCoroutine(UIManager.Instance.PlayVideoAndLoad("GameScene"));
+        }
+        else
+        {
+            // Timed out — token expired, revoked, or no network to refresh
+            Debug.LogWarning("[AutoLogin] Firebase session not restored within timeout. Clearing save and showing login.");
+            LoginSaveManager.ClearLoginState();
+        }
+    }
+
+    // =========================================================================
+    // --- GOOGLE SIGN-IN ---
     // =========================================================================
 
     public void LoginWithGoogle()
@@ -122,27 +179,23 @@ public class FirebaseAuthManager : MonoBehaviour
             if (task.IsCanceled)
             {
                 Debug.LogWarning("Google Sign-In cancelled.");
-                EnqueueOnMainThread(() => {
-                    UIManager.Instance.ShowLoginMessage("Google Sign-In cancelled.", isError: true);
-                });
+                EnqueueOnMainThread(() =>
+                    UIManager.Instance.ShowLoginMessage("Google Sign-In cancelled.", isError: true));
             }
             else if (task.IsFaulted)
             {
                 Debug.LogError("Google Sign-In error: " + task.Exception);
-                EnqueueOnMainThread(() => {
+                EnqueueOnMainThread(() =>
+                {
                     string errorMsg = task.Exception?.GetBaseException().Message ?? "Unknown Error";
                     UIManager.Instance.ShowLoginMessage($"Google Error: {errorMsg}", isError: true);
                 });
             }
             else
             {
-                Debug.Log("Google Auth Success. Exchanging token with Firebase...");
                 string idToken = task.Result.IdToken;
                 Credential credential = GoogleAuthProvider.GetCredential(idToken, null);
-
-                EnqueueOnMainThread(() => {
-                    StartCoroutine(LoginWithCredentialAsync(credential));
-                });
+                EnqueueOnMainThread(() => StartCoroutine(LoginWithCredentialAsync(credential)));
             }
         });
     }
@@ -154,25 +207,21 @@ public class FirebaseAuthManager : MonoBehaviour
 
         if (loginTask.Exception != null)
         {
-            Debug.LogError("Firebase Credential Authentication Failed: " + loginTask.Exception);
-            FirebaseException firebaseException = loginTask.Exception.GetBaseException() as FirebaseException;
-            AuthError authError = (AuthError)firebaseException.ErrorCode;
+            Debug.LogError("Firebase Credential Auth Failed: " + loginTask.Exception);
+            FirebaseException firebaseEx = loginTask.Exception.GetBaseException() as FirebaseException;
+            AuthError authError = (AuthError)firebaseEx.ErrorCode;
 
             string failedMessage = "Google Login Failed! Because ";
             switch (authError)
             {
                 case AuthError.AccountExistsWithDifferentCredentials:
-                    failedMessage += "An account already exists with this email using a different login method.";
-                    break;
+                    failedMessage += "An account already exists with this email using a different login method."; break;
                 case AuthError.InvalidCredential:
-                    failedMessage += "The login token is expired or invalid.";
-                    break;
+                    failedMessage += "The login token is expired or invalid."; break;
                 case AuthError.UserDisabled:
-                    failedMessage += "This user account has been disabled.";
-                    break;
+                    failedMessage += "This user account has been disabled."; break;
                 default:
-                    failedMessage += firebaseException.Message;
-                    break;
+                    failedMessage += firebaseEx.Message; break;
             }
             UIManager.Instance.ShowLoginMessage(failedMessage, isError: true);
         }
@@ -183,7 +232,7 @@ public class FirebaseAuthManager : MonoBehaviour
     }
 
     // =========================================================================
-    // --- EMAIL / PASSWORD SYSTEM ---
+    // --- EMAIL / PASSWORD ---
     // =========================================================================
 
     public void Login()
@@ -199,8 +248,8 @@ public class FirebaseAuthManager : MonoBehaviour
         if (loginTask.Exception != null)
         {
             Debug.LogError(loginTask.Exception);
-            FirebaseException firebaseException = loginTask.Exception.GetBaseException() as FirebaseException;
-            AuthError authError = (AuthError)firebaseException.ErrorCode;
+            FirebaseException firebaseEx = loginTask.Exception.GetBaseException() as FirebaseException;
+            AuthError authError = (AuthError)firebaseEx.ErrorCode;
 
             string failedMessage = "Login Failed! Because ";
             switch (authError)
@@ -211,7 +260,7 @@ public class FirebaseAuthManager : MonoBehaviour
                 case AuthError.MissingPassword: failedMessage += "Password is missing"; break;
                 case AuthError.UserNotFound: failedMessage += "Account not found"; break;
                 default:
-                    string errorMsg = firebaseException.Message.ToLower();
+                    string errorMsg = firebaseEx.Message.ToLower();
                     if (errorMsg.Contains("invalid_password") || errorMsg.Contains("wrong password"))
                         failedMessage += "Wrong Password";
                     else if (errorMsg.Contains("invalid_login_credentials") || errorMsg.Contains("invalid login credentials"))
@@ -222,7 +271,7 @@ public class FirebaseAuthManager : MonoBehaviour
                         failedMessage += "Account not found";
                     else
                     {
-                        Debug.Log("Unhandled Firebase error: " + firebaseException.Message);
+                        Debug.Log("Unhandled Firebase error: " + firebaseEx.Message);
                         failedMessage = "Login Failed. Please try again";
                     }
                     break;
@@ -263,8 +312,8 @@ public class FirebaseAuthManager : MonoBehaviour
             if (registerTask.Exception != null)
             {
                 Debug.LogError(registerTask.Exception);
-                FirebaseException firebaseException = registerTask.Exception.GetBaseException() as FirebaseException;
-                AuthError authError = (AuthError)firebaseException.ErrorCode;
+                FirebaseException firebaseEx = registerTask.Exception.GetBaseException() as FirebaseException;
+                AuthError authError = (AuthError)firebaseEx.ErrorCode;
 
                 string failedMessage = "Registration Failed! Because ";
                 switch (authError)
@@ -288,8 +337,8 @@ public class FirebaseAuthManager : MonoBehaviour
                 {
                     user.DeleteAsync();
                     Debug.LogError(updateProfileTask.Exception);
-                    FirebaseException firebaseException = updateProfileTask.Exception.GetBaseException() as FirebaseException;
-                    AuthError authError = (AuthError)firebaseException.ErrorCode;
+                    FirebaseException firebaseEx = updateProfileTask.Exception.GetBaseException() as FirebaseException;
+                    AuthError authError = (AuthError)firebaseEx.ErrorCode;
 
                     string failedMessage = "Profile Update Failed! Because ";
                     switch (authError)
@@ -305,7 +354,8 @@ public class FirebaseAuthManager : MonoBehaviour
                 }
                 else
                 {
-                    UIManager.Instance.ShowRegistrationMessage("Welcome " + user.DisplayName + "! Registration Successful.", isError: false);
+                    UIManager.Instance.ShowRegistrationMessage(
+                        "Welcome " + user.DisplayName + "! Registration Successful.", isError: false);
                     UIManager.Instance.OpenLoginPanel();
                 }
             }
@@ -313,7 +363,7 @@ public class FirebaseAuthManager : MonoBehaviour
     }
 
     // =========================================================================
-    // --- POST-LOGIN FLOW ---
+    // --- POST-LOGIN ---
     // =========================================================================
 
     private void ProcessSuccessfulLogin(FirebaseUser targetUser)
@@ -321,10 +371,33 @@ public class FirebaseAuthManager : MonoBehaviour
         user = targetUser;
         string displayName = string.IsNullOrEmpty(user.DisplayName) ? "User" : user.DisplayName;
 
+        // Persist login so next launch skips this scene
+        LoginSaveManager.SaveLoginState(user.UserId, displayName);
+
         UIManager.Instance.ShowLoginMessage($"Welcome, {displayName}! Logged in successfully.", isError: false);
         References.userName = displayName;
 
         // Start the transition video sequence and change scene
         StartCoroutine(UIManager.Instance.PlayVideoAndLoad("GameScene"));
+    }
+
+    // =========================================================================
+    // --- LOGOUT ---
+    // =========================================================================
+
+    /// <summary>
+    /// Signs the user out and clears the saved login so next launch shows LoginScene.
+    /// Wire this to your in-game logout/settings button.
+    /// </summary>
+    public void Logout()
+    {
+        if (auth != null)
+            auth.SignOut();
+
+        if (isGoogleSignInInitialized)
+            GoogleSignIn.DefaultInstance.SignOut();
+
+        LoginSaveManager.ClearLoginState();
+        UnityEngine.SceneManagement.SceneManager.LoadScene("FirebaseLogin");
     }
 }

@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Video; // ✅ add this
+using UnityEngine.Video;
 
 public class UIManager : MonoBehaviour
 {
@@ -16,22 +15,64 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text registrationOutputText;
 
     [Header("Loading Video")]
-    [SerializeField] private GameObject loadingPanel;    // panel that shows during loading
-    [SerializeField] private VideoPlayer loadingVideo;   // video player component
+    [SerializeField] private GameObject loadingPanel;
+    [SerializeField] private VideoPlayer loadingVideo;
+
+    [Header("Throbber")]
+    [Tooltip("Root panel that covers the whole screen while Firebase is initializing")]
+    [SerializeField] private GameObject throbberPanel;
+    [Tooltip("The RectTransform that spins (assign the circle/ring image)")]
+    [SerializeField] private RectTransform throbberSpinner;
+    [Tooltip("Degrees per second — 360 = one full rotation per second")]
+    [SerializeField] private float spinSpeed = 360f;
+
+    private bool isSpinning = false;
+
+    // -------------------------------------------------------------------------
 
     private void Awake()
     {
-        CreateInstance();
-    }
-
-    private void CreateInstance()
-    {
         if (Instance == null)
             Instance = this;
+
+        // Hide everything except the throbber so there is zero flash of the
+        // login UI while Firebase is restoring its auth session.
+        if (loginPanel != null)        loginPanel.SetActive(false);
+        if (registrationPanel != null) registrationPanel.SetActive(false);
+        if (loadingPanel != null)      loadingPanel.SetActive(false);
+
+        ShowThrobber();   // on by default until FirebaseAuthManager decides what to show
     }
+
+    private void Update()
+    {
+        if (isSpinning && throbberSpinner != null)
+            throbberSpinner.Rotate(0f, 0f, -spinSpeed * Time.deltaTime);
+    }
+
+    // =========================================================================
+    // THROBBER
+    // =========================================================================
+
+    public void ShowThrobber()
+    {
+        if (throbberPanel != null) throbberPanel.SetActive(true);
+        isSpinning = true;
+    }
+
+    public void HideThrobber()
+    {
+        if (throbberPanel != null) throbberPanel.SetActive(false);
+        isSpinning = false;
+    }
+
+    // =========================================================================
+    // PANELS
+    // =========================================================================
 
     public void OpenLoginPanel()
     {
+        HideThrobber();
         loginPanel.SetActive(true);
         registrationPanel.SetActive(false);
         ClearMessages();
@@ -39,6 +80,7 @@ public class UIManager : MonoBehaviour
 
     public void OpenRegistrationPanel()
     {
+        HideThrobber();
         registrationPanel.SetActive(true);
         loginPanel.SetActive(false);
         ClearMessages();
@@ -60,17 +102,17 @@ public class UIManager : MonoBehaviour
 
     private void ClearMessages()
     {
-        if (loginOutputText != null) loginOutputText.text = "";
+        if (loginOutputText != null)        loginOutputText.text = "";
         if (registrationOutputText != null) registrationOutputText.text = "";
     }
 
-    // ===========================
-    // 🎬 LOADING VIDEO
-    // ===========================
+    // =========================================================================
+    // LOADING VIDEO
+    // =========================================================================
 
-// ✅ ADD THIS INSTEAD
     public IEnumerator PlayVideoAndLoad(string sceneName)
     {
+        HideThrobber();
         loadingPanel.SetActive(true);
         loginPanel.SetActive(false);
 
@@ -78,12 +120,10 @@ public class UIManager : MonoBehaviour
 
         loadingVideo.Stop();
         loadingVideo.time = 0;
-
         loadingVideo.Prepare();
-        Debug.Log("🎬 Preparing video...");
 
+        Debug.Log("🎬 Preparing video...");
         yield return new WaitUntil(() => loadingVideo.isPrepared);
-        Debug.Log("🎬 Video prepared!");
 
         loadingVideo.Play();
         Debug.Log("🎬 Video playing!");

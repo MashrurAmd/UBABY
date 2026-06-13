@@ -119,10 +119,11 @@ public class FirebaseAuthManager : MonoBehaviour
     /// </summary>
     private IEnumerator AutoLoginCoroutine()
     {
-        // No saved login on this device → stay on login screen immediately
+        // No saved login on this device → drop straight to login screen
         if (!LoginSaveManager.HasSavedLogin())
         {
             Debug.Log("[AutoLogin] No saved login. Showing login screen.");
+            UIManager.Instance.OpenLoginPanel();   // hides throbber, shows login UI
             yield break;
         }
 
@@ -140,20 +141,21 @@ public class FirebaseAuthManager : MonoBehaviour
 
         if (auth.CurrentUser != null)
         {
-            // Firebase confirmed the session is still valid
+            // Firebase confirmed the session is still valid — go straight to game
             string displayName = string.IsNullOrEmpty(auth.CurrentUser.DisplayName)
                 ? LoginSaveManager.SavedDisplayName
                 : auth.CurrentUser.DisplayName;
 
             Debug.Log($"[AutoLogin] Session restored for {displayName}. Going to GameScene.");
             References.userName = displayName;
-            StartCoroutine(UIManager.Instance.PlayVideoAndLoad("GameScene"));
+            StartCoroutine(UIManager.Instance.PlayVideoAndLoad("GameScene"));  // hides throbber internally
         }
         else
         {
             // Timed out — token expired, revoked, or no network to refresh
             Debug.LogWarning("[AutoLogin] Firebase session not restored within timeout. Clearing save and showing login.");
             LoginSaveManager.ClearLoginState();
+            UIManager.Instance.OpenLoginPanel();   // hides throbber, shows login UI
         }
     }
 
@@ -163,6 +165,8 @@ public class FirebaseAuthManager : MonoBehaviour
 
     public void LoginWithGoogle()
     {
+        UIManager.Instance.ShowThrobber();
+
         if (!isGoogleSignInInitialized)
         {
             GoogleSignIn.Configuration = new GoogleSignInConfiguration
@@ -180,13 +184,17 @@ public class FirebaseAuthManager : MonoBehaviour
             {
                 Debug.LogWarning("Google Sign-In cancelled.");
                 EnqueueOnMainThread(() =>
-                    UIManager.Instance.ShowLoginMessage("Google Sign-In cancelled.", isError: true));
+                {
+                    UIManager.Instance.HideThrobber();
+                    UIManager.Instance.ShowLoginMessage("Google Sign-In cancelled.", isError: true);
+                });
             }
             else if (task.IsFaulted)
             {
                 Debug.LogError("Google Sign-In error: " + task.Exception);
                 EnqueueOnMainThread(() =>
                 {
+                    UIManager.Instance.HideThrobber();
                     string errorMsg = task.Exception?.GetBaseException().Message ?? "Unknown Error";
                     UIManager.Instance.ShowLoginMessage($"Google Error: {errorMsg}", isError: true);
                 });
@@ -202,6 +210,8 @@ public class FirebaseAuthManager : MonoBehaviour
 
     private IEnumerator LoginWithCredentialAsync(Credential credential)
     {
+        UIManager.Instance.ShowThrobber();
+
         var loginTask = auth.SignInWithCredentialAsync(credential);
         yield return new WaitUntil(() => loginTask.IsCompleted);
 
@@ -223,6 +233,7 @@ public class FirebaseAuthManager : MonoBehaviour
                 default:
                     failedMessage += firebaseEx.Message; break;
             }
+            UIManager.Instance.HideThrobber();
             UIManager.Instance.ShowLoginMessage(failedMessage, isError: true);
         }
         else
@@ -242,6 +253,8 @@ public class FirebaseAuthManager : MonoBehaviour
 
     private IEnumerator LoginAsync(string email, string password)
     {
+        UIManager.Instance.ShowThrobber();
+
         var loginTask = auth.SignInWithEmailAndPasswordAsync(email, password);
         yield return new WaitUntil(() => loginTask.IsCompleted);
 
@@ -276,6 +289,7 @@ public class FirebaseAuthManager : MonoBehaviour
                     }
                     break;
             }
+            UIManager.Instance.HideThrobber();
             UIManager.Instance.ShowLoginMessage(failedMessage, isError: true);
         }
         else
@@ -306,6 +320,8 @@ public class FirebaseAuthManager : MonoBehaviour
         }
         else
         {
+            UIManager.Instance.ShowThrobber();
+
             var registerTask = auth.CreateUserWithEmailAndPasswordAsync(email, password);
             yield return new WaitUntil(() => registerTask.IsCompleted);
 
@@ -324,6 +340,7 @@ public class FirebaseAuthManager : MonoBehaviour
                     case AuthError.MissingPassword: failedMessage += "Password is missing"; break;
                     default: failedMessage = "Registration Failed"; break;
                 }
+                UIManager.Instance.HideThrobber();
                 UIManager.Instance.ShowRegistrationMessage(failedMessage, isError: true);
             }
             else
@@ -350,10 +367,12 @@ public class FirebaseAuthManager : MonoBehaviour
                         case AuthError.MissingPassword: failedMessage += "Password is missing"; break;
                         default: failedMessage = "Registration Failed"; break;
                     }
+                    UIManager.Instance.HideThrobber();
                     UIManager.Instance.ShowRegistrationMessage(failedMessage, isError: true);
                 }
                 else
                 {
+                    UIManager.Instance.HideThrobber();
                     UIManager.Instance.ShowRegistrationMessage(
                         "Welcome " + user.DisplayName + "! Registration Successful.", isError: false);
                     UIManager.Instance.OpenLoginPanel();

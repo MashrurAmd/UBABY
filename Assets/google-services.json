@@ -13,7 +13,20 @@
           "package_name": "com.UBaby"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "843319817240-5j8ivnprr4r6udq5hcrmegu5svvhseh8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.UBaby",
+            "certificate_hash": "1e3afcc00816cd5c8eafaf24cd6f6d3c58b7a83e"
+          }
+        },
+        {
+          "client_id": "843319817240-a3kd2bdvlsmd644o2gsdtf0fcffkrl5s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAzuTzkQ8sfRD0RfDsyzeU-3Lbw716iqlI"
@@ -21,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "843319817240-a3kd2bdvlsmd644o2gsdtf0fcffkrl5s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "843319817240-ll3h8ogeo99j16car9fgv5jp47nqv2ub.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.UBaby"
+              }
+            }
+          ]
         }
       }
     }

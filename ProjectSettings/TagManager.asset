@@ -9,6 +9,20 @@ TagManager:
   - Leg
   - BodyHit
   - Basket
+  - Bomb
+  - Ground
+  - Ball
+  - RedBall
+  - BlueBall
+  - GreenBall
+  - YellowBall
+  - BlackBall
+  - CyanBall
+  - DarkBlueBall
+  - MaroonBall
+  - PurpleBall
+  - WhiteBall
+  - PinkBall
   layers:
   - Default
   - TransparentFX

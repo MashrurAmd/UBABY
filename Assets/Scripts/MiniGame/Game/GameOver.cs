@@ -19,19 +19,33 @@ public class GameOverLine : MonoBehaviour
     {
         StopAllCoroutines(); // Reset timer when ball leaves
     }
+    
+    
 
     private System.Collections.IEnumerator CheckBallStay(Collider ball)
     {
         yield return new WaitForSeconds(stayDuration);
 
-        // If the ball is still inside after 2 seconds, trigger Game Over
         if (ball != null && ball.bounds.Intersects(GetComponent<Collider>().bounds))
         {
             Debug.Log("Game Over: Ball stayed too long!");
+        
+            Debug.Log("gameOverManager is null: " + (gameOverManager == null)); // ✅
+        
             if (gameOverManager != null)
             {
+                Debug.Log("Calling ShowGameOverPanel..."); // ✅
                 gameOverManager.ShowGameOverPanel();
+                Debug.Log("ShowGameOverPanel called!"); // ✅
             }
+            else
+            {
+                Debug.LogError("❌ gameOverManager is NULL - assign it in Inspector!"); // ✅
+            }
+        }
+        else
+        {
+            Debug.Log("Ball left the trigger zone - no game over"); // ✅
         }
     }
 }

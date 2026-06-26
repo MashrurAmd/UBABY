@@ -87,7 +87,9 @@ public class BallController : MonoBehaviour
 
             foreach (Collider hit in hits)
             {
-                if (hit.CompareTag("Ball"))
+                // ✅ Use BallData instead of "Ball" tag
+                BallData bd = hit.GetComponent<BallData>();
+                if (bd != null && !hit.CompareTag("Bomb") && !hit.CompareTag("PowerBall"))
                 {
                     poppedCount++;
                     hit.transform.DOPunchScale(Vector3.one * 0.3f, 0.2f, 5, 0.7f)
@@ -95,13 +97,11 @@ public class BallController : MonoBehaviour
                         {
                             if (bombParticlePrefab != null)
                                 Instantiate(bombParticlePrefab, hit.transform.position, Quaternion.identity);
-
                             hit.gameObject.SetActive(false);
                         });
                 }
             }
 
-            // ✅ Play bomb sound
             if (Audio.Instance != null)
                 Audio.Instance.PlaySFX(Audio.Instance.bomb);
 
@@ -123,7 +123,9 @@ public class BallController : MonoBehaviour
             return;
         }
 
-        if (collision.gameObject.CompareTag("Ball"))
+        // ✅ Check by BallData component instead of tag
+        BallData otherBallData = collision.gameObject.GetComponent<BallData>();
+        if (otherBallData != null)
         {
             if (CompareTag("PowerBall"))
             {
@@ -235,10 +237,11 @@ public class BallController : MonoBehaviour
             Collider[] hits = Physics.OverlapSphere(current.transform.position, 1f);
             foreach (Collider hit in hits)
             {
-                if (hit.CompareTag("Ball") && !result.Contains(hit.gameObject))
+                // ✅ Use BallData component instead of "Ball" tag
+                BallData otherData = hit.GetComponent<BallData>();
+                if (otherData != null && !result.Contains(hit.gameObject))
                 {
-                    BallData otherData = hit.GetComponent<BallData>();
-                    if (otherData != null && otherData.colorID == colorID)
+                    if (otherData.colorID == colorID)
                     {
                         result.Add(hit.gameObject);
                         queue.Enqueue(hit.gameObject);

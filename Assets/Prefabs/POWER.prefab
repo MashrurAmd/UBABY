@@ -163,6 +163,5 @@ MonoBehaviour:
   moveSpeed: 5
   spawner: {fileID: 0}
   bombParticlePrefab: {fileID: 0}
-  powerParticlePrefab: {fileID: 5112403345868107898, guid: 6f34ef0d986e9db4199cf75805f79753,
-    type: 3}
+  powerParticlePrefab: {fileID: 5112403345868107898, guid: 6f34ef0d986e9db4199cf75805f79753, type: 3}
   normalPopParticlePrefab: {fileID: 0}

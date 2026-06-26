@@ -23,6 +23,7 @@ TagManager:
   - PurpleBall
   - WhiteBall
   - PinkBall
+  - PowerBall
   layers:
   - Default
   - TransparentFX

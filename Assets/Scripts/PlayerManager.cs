@@ -47,7 +47,9 @@ public class PlayerManager : MonoBehaviour
     public AudioSource sleepSound2;
     
     [Header("Eating Settings")]
-    public float mouthRadius = 100f; // ✅ adjust this in Inspector
+    public float mouthRadius = 200f; // ✅ adjust this in Inspector
+    public float grabRadiusMultiplier = 2.5f;
+    
 
     // ✅ track actual recorded samples
     private int recordedSamples = 0;
@@ -59,10 +61,16 @@ public class PlayerManager : MonoBehaviour
         recordIconColor = recordIcon.color;
         productMaxX = buttonMaxRight.position.x - productMiddle.transform.position.x;
         productMinX = -productMaxX;
-        productMaxY = productMaxX; // ✅ Y uses X value which might be wrong
+        productMaxY = productMaxX;
         productMinY = -productMaxX;
         _waitTime = maxRecordTime;
-        
+
+        // ✅ Apply multiplier
+        productMaxX *= grabRadiusMultiplier;
+        productMinX *= grabRadiusMultiplier;
+        productMaxY *= grabRadiusMultiplier;
+        productMinY *= grabRadiusMultiplier;
+
         Debug.Log($"Grab zone X: {productMinX} to {productMaxX}");
         Debug.Log($"Grab zone Y: {productMinY} to {productMaxY}");
     }
@@ -71,7 +79,10 @@ public class PlayerManager : MonoBehaviour
     {
         // ✅ Body hit detection
         if (Input.GetMouseButtonDown(0))
-            CheckBodyHit(Input.mousePosition);
+        {
+            if (currentRoom != kitchen)
+                CheckBodyHit(Input.mousePosition);
+        }
 
 #if !UNITY_EDITOR
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)

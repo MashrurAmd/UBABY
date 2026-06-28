@@ -40708,6 +40708,7 @@ MonoBehaviour:
   sleepParticleEffect: {fileID: 1962533280}
   sleepSound1: {fileID: 251460068}
   sleepSound2: {fileID: 930137795}
+  mouthRadius: 200
   isSleeping: 0
 --- !u!4 &1244426636
 Transform:

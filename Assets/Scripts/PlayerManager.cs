@@ -45,6 +45,9 @@ public class PlayerManager : MonoBehaviour
     [Header("Sleep Sounds")]
     public AudioSource sleepSound1;
     public AudioSource sleepSound2;
+    
+    [Header("Eating Settings")]
+    public float mouthRadius = 100f; // ✅ adjust this in Inspector
 
     // ✅ track actual recorded samples
     private int recordedSamples = 0;
@@ -56,9 +59,12 @@ public class PlayerManager : MonoBehaviour
         recordIconColor = recordIcon.color;
         productMaxX = buttonMaxRight.position.x - productMiddle.transform.position.x;
         productMinX = -productMaxX;
-        productMaxY = productMaxX;
+        productMaxY = productMaxX; // ✅ Y uses X value which might be wrong
         productMinY = -productMaxX;
         _waitTime = maxRecordTime;
+        
+        Debug.Log($"Grab zone X: {productMinX} to {productMaxX}");
+        Debug.Log($"Grab zone Y: {productMinY} to {productMaxY}");
     }
 
     void Update()
@@ -83,19 +89,26 @@ public class PlayerManager : MonoBehaviour
         {
             if (isHoldingFood)
             {
-                mouthDistance = floatingFoodImage.transform.position - Camera.main.WorldToScreenPoint(playerMouth.position);
-                if (mouthDistance.x < productMaxX && mouthDistance.x > productMinX &&
-                    mouthDistance.y < productMaxY && mouthDistance.y > productMinY)
+                // ✅ Use distance instead of box check
+                Vector2 foodPos = floatingFoodImage.transform.position;
+                Vector2 mouthPos = Camera.main.WorldToScreenPoint(playerMouth.position);
+                float distToMouth = Vector2.Distance(foodPos, mouthPos);
+
+                Debug.Log($"Distance to mouth: {distToMouth}, radius: {mouthRadius}");
+
+                if (distToMouth < mouthRadius) // ✅ circle check instead of box
                 {
                     playerAnimator.SetTrigger("Eat");
                     floatingFoodImage.GetComponent<Image>().sprite = null;
                     floatingFoodImage.transform.position = floatingFoodStartPosition;
                     eatingAudio.Play();
                     storeManager.Eat();
+                    Debug.Log("✅ Food eaten!");
                 }
                 else
                 {
                     floatingFoodImage.transform.position = floatingFoodStartPosition;
+                    Debug.Log("❌ Missed mouth, distance: " + distToMouth);
                 }
                 playerAnimator.SetBool("OpenMouth", false);
             }
@@ -109,12 +122,16 @@ public class PlayerManager : MonoBehaviour
             if (currentRoom == kitchen && storeManager.myProducts.Count > 0)
             {
                 distance = fingerPos - productMiddle.transform.position;
+
+                Debug.Log($"Finger distance from food: {distance}"); // ✅ debug
+
                 if (!isHoldingFood &&
                     distance.x < productMaxX && distance.x > productMinX &&
                     distance.y < productMaxY && distance.y > productMinY)
                 {
                     isHoldingFood = true;
                     playerAnimator.SetBool("OpenMouth", true);
+                    Debug.Log("✅ Food grabbed!"); // ✅ debug
                 }
             }
 

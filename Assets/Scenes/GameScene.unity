@@ -40709,6 +40709,7 @@ MonoBehaviour:
   sleepSound1: {fileID: 251460068}
   sleepSound2: {fileID: 930137795}
   mouthRadius: 200
+  grabRadiusMultiplier: 4
   isSleeping: 0
 --- !u!4 &1244426636
 Transform:

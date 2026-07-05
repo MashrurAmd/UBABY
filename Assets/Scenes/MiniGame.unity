@@ -3263,7 +3263,8 @@ PrefabInstance:
       value: BaseModel@Standing Idle
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: -7031158809361399825, guid: 5a4f2070328c0bb40ab80ae60ef2bdd4, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5a4f2070328c0bb40ab80ae60ef2bdd4, type: 3}

@@ -45,20 +45,13 @@ IEnumerator NeedsRoutine()
     while (true)
     {
         if (playerManager.playerAnimator.GetBool("Talking") ||
-            playerManager.playerAnimator.GetBool("Listening"))
+            playerManager.playerAnimator.GetBool("Listening") ||
+            playerManager.isSleeping) // ✅ bail immediately if sleeping
         {
             yield return null;
             continue;
         }
 
-        // ✅ Skip all popups if player is sleeping
-        if (playerManager.isSleeping)
-        {
-            yield return null;
-            continue;
-        }
-
-        // ✅ Global cooldown check
         if (Time.time - lastPopupTime < cooldownBetweenPopups)
         {
             yield return null;
@@ -67,13 +60,12 @@ IEnumerator NeedsRoutine()
 
         if (!popupActive)
         {
-            // --- HUNGER --- ✅ skip if sleeping
+            // --- HUNGER ---
             if (storeManager.kitchenProgressBar.fillAmount < hungerThreshold)
             {
                 popupActive = true;
-                yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
+                yield return WaitUnlessSleeping(Random.Range(minDelay, maxDelay));
 
-                // ✅ Check again after delay in case player fell asleep during wait
                 if (!playerManager.isSleeping)
                 {
                     ShowPopup("I am hungry 😿", hungryClip);
@@ -88,23 +80,31 @@ IEnumerator NeedsRoutine()
                 popupActive = false;
             }
 
+            // ✅ re-check between blocks — don't fall through stale state
+            if (playerManager.isSleeping) { yield return null; continue; }
+
             // --- SLEEP ---
             if (playerManager.sleepProgressBar.fillAmount < sleepThreshold)
             {
                 popupActive = true;
-                yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
-                ShowPopup("I want to sleep 💤", sleepClip);
-                lastPopupTime = Time.time;
+                yield return WaitUnlessSleeping(Random.Range(minDelay, maxDelay));
+
+                if (!playerManager.isSleeping) // ✅ this check was missing entirely
+                {
+                    ShowPopup("I want to sleep 💤", sleepClip);
+                    lastPopupTime = Time.time;
+                }
                 popupActive = false;
             }
 
-            // --- SHOWER --- ✅ skip if sleeping
+            if (playerManager.isSleeping) { yield return null; continue; }
+
+            // --- SHOWER ---
             if (showerManager.showerProgressImage.fillAmount < showerThreshold)
             {
                 popupActive = true;
-                yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
+                yield return WaitUnlessSleeping(Random.Range(minDelay, maxDelay));
 
-                // ✅ Check again after delay in case player fell asleep during wait
                 if (!playerManager.isSleeping)
                 {
                     ShowPopup("I need shower 🚿", showerClip);
@@ -113,7 +113,9 @@ IEnumerator NeedsRoutine()
                 popupActive = false;
             }
 
-            // --- FULL ---
+            if (playerManager.isSleeping) { yield return null; continue; }
+
+            // --- FULL / DONE checks (instant, no wait) ---
             if (storeManager.kitchenProgressBar.fillAmount >= 1f)
             {
                 popupActive = true;
@@ -122,7 +124,6 @@ IEnumerator NeedsRoutine()
                 popupActive = false;
             }
 
-            // --- SLEEP DONE ---
             if (playerManager.sleepProgressBar.fillAmount >= 1f)
             {
                 popupActive = true;
@@ -131,8 +132,7 @@ IEnumerator NeedsRoutine()
                 popupActive = false;
             }
 
-            // --- SHOWER DONE ---
-            if (showerManager.showerProgressImage.fillAmount >= 1f)
+            if (!playerManager.isSleeping && showerManager.showerProgressImage.fillAmount >= 1f)
             {
                 popupActive = true;
                 ShowPopup("Shower done 🚿", fullClip, false);
@@ -141,6 +141,19 @@ IEnumerator NeedsRoutine()
             }
         }
 
+        yield return null;
+    }
+}
+
+// ✅ New helper: waits up to `duration`, but bails out early
+// the moment the player falls asleep, instead of blocking for
+// the full 5–10 minutes regardless of state.
+IEnumerator WaitUnlessSleeping(float duration)
+{
+    float t = 0f;
+    while (t < duration && !playerManager.isSleeping)
+    {
+        t += Time.deltaTime;
         yield return null;
     }
 }

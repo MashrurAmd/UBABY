@@ -20,6 +20,7 @@ public class PlayerManager : MonoBehaviour
     public AudioSource eatingAudio, switchAudio;
     public Animator playerAnimator;
     public GameObject officeButton, kitchenButton, showerButton, bedRommButtom, sleepBG, sleepButton;
+    public GameObject miniGameButton;
     public Text sleepButtonText;
     public float _waitTime, _elapsed;
     public int maxRecordTime;
@@ -50,12 +51,6 @@ public class PlayerManager : MonoBehaviour
     public float mouthRadius = 200f; // ✅ adjust this in Inspector
     public float grabRadiusMultiplier = 2.5f;
     
-    [Header("Bar Decrease Settings")]
-    public float hungerDecreaseRate = 0.00005f;  // ✅ very slow decrease
-    public float sleepDecreaseRate  = 0.00005f;  // ✅ very slow decrease
-    public float showerDecreaseRate = 0.00005f;  // ✅ very slow decrease
-
-    
 
     // ✅ track actual recorded samples
     private int recordedSamples = 0;
@@ -79,21 +74,12 @@ public class PlayerManager : MonoBehaviour
 
         Debug.Log($"Grab zone X: {productMinX} to {productMaxX}");
         Debug.Log($"Grab zone Y: {productMinY} to {productMaxY}");
+
+        UpdateRoomCamera();
     }
 
     void Update()
     {
-        // ✅ Slowly decrease all bars over time
-        if (storeManager.kitchenProgressBar.fillAmount > 0)
-            storeManager.kitchenProgressBar.fillAmount -= hungerDecreaseRate * Time.deltaTime;
-
-        if (sleepProgressBar.fillAmount > 0 && !isSleeping)
-            sleepProgressBar.fillAmount -= sleepDecreaseRate * Time.deltaTime;
-
-        if (showerManager.showerProgressImage.fillAmount > 0)
-            showerManager.showerProgressImage.fillAmount -= showerDecreaseRate * Time.deltaTime;
-
-        
         // ✅ Body hit detection
         if (Input.GetMouseButtonDown(0))
         {
@@ -340,6 +326,9 @@ public class PlayerManager : MonoBehaviour
         showerCamera.gameObject.SetActive(currentRoom == shower);
         bedroomCamera.gameObject.SetActive(currentRoom == bedroom);
         wardrobeCamera.gameObject.SetActive(currentRoom == wardrobe);
+
+        // MiniGame button only shows up while the Office Camera is the active camera
+        miniGameButton.SetActive(officeCamera.gameObject.activeSelf);
     }
 
     // ===========================

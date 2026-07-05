@@ -40689,6 +40689,7 @@ MonoBehaviour:
   bedRommButtom: {fileID: 2096849596}
   sleepBG: {fileID: 2013849629}
   sleepButton: {fileID: 1075614332}
+  miniGameButton: {fileID: 401653249}
   sleepButtonText: {fileID: 1345759996}
   _waitTime: 0
   _elapsed: 0
@@ -40710,9 +40711,6 @@ MonoBehaviour:
   sleepSound2: {fileID: 930137795}
   mouthRadius: 200
   grabRadiusMultiplier: 4
-  hungerDecreaseRate: 0.00005
-  sleepDecreaseRate: 0.00005
-  showerDecreaseRate: 0.00005
   isSleeping: 0
 --- !u!4 &1244426636
 Transform:

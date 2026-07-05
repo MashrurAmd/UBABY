@@ -19,11 +19,14 @@ public class CatNeedsPopup : MonoBehaviour
     public float popupDuration = 1f;
 
     [Header("Settings")]
-    public float minDelay = 30f;
-    public float maxDelay = 60f;
+    public float minDelay = 300f;
+    public float maxDelay = 600f;
     public float hungerThreshold = 0.5f;
     public float sleepThreshold = 0.5f;
     public float showerThreshold = 0.5f;
+    
+    private float lastPopupTime = -999f;
+    public float cooldownBetweenPopups = 120f; 
 
     [Header("Animation Cooldown")]
     public float hungryCooldown = 20f; // ✅ 20 seconds between hungry animations
@@ -48,9 +51,16 @@ IEnumerator NeedsRoutine()
             continue;
         }
 
+        // ✅ Global cooldown check
+        if (Time.time - lastPopupTime < cooldownBetweenPopups)
+        {
+            yield return null;
+            continue;
+        }
+
         if (!popupActive)
         {
-            // --- HUNGER --- ✅ runs independently
+            // --- HUNGER ---
             if (storeManager.kitchenProgressBar.fillAmount < hungerThreshold)
             {
                 popupActive = true;
@@ -62,48 +72,55 @@ IEnumerator NeedsRoutine()
                     playerAnimator.SetTrigger("Hungry");
                     lastHungryAnimTime = Time.time;
                 }
+
+                lastPopupTime = Time.time; // ✅ update last popup time
                 popupActive = false;
             }
 
-            // --- SLEEP --- ✅ runs independently
+            // --- SLEEP ---
             if (playerManager.sleepProgressBar.fillAmount < sleepThreshold)
             {
                 popupActive = true;
                 yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
                 ShowPopup("I want to sleep 💤", sleepClip);
+                lastPopupTime = Time.time; // ✅
                 popupActive = false;
             }
 
-            // --- SHOWER --- ✅ runs independently
+            // --- SHOWER ---
             if (showerManager.showerProgressImage.fillAmount < showerThreshold)
             {
                 popupActive = true;
                 yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
                 ShowPopup("I need shower 🚿", showerClip);
+                lastPopupTime = Time.time; // ✅
                 popupActive = false;
             }
 
-            // --- FULL --- ✅
+            // --- FULL ---
             if (storeManager.kitchenProgressBar.fillAmount >= 1f)
             {
                 popupActive = true;
                 ShowPopup("I am full 😺", fullClip, false);
+                lastPopupTime = Time.time; // ✅
                 popupActive = false;
             }
 
-            // --- SLEEP DONE --- ✅
+            // --- SLEEP DONE ---
             if (playerManager.sleepProgressBar.fillAmount >= 1f)
             {
                 popupActive = true;
                 ShowPopup("Sleep done 😴", fullClip, false);
+                lastPopupTime = Time.time; // ✅
                 popupActive = false;
             }
 
-            // --- SHOWER DONE --- ✅
+            // --- SHOWER DONE ---
             if (showerManager.showerProgressImage.fillAmount >= 1f)
             {
                 popupActive = true;
                 ShowPopup("Shower done 🚿", fullClip, false);
+                lastPopupTime = Time.time; // ✅
                 popupActive = false;
             }
         }

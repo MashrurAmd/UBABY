@@ -50,6 +50,12 @@ public class PlayerManager : MonoBehaviour
     public float mouthRadius = 200f; // ✅ adjust this in Inspector
     public float grabRadiusMultiplier = 2.5f;
     
+    [Header("Bar Decrease Settings")]
+    public float hungerDecreaseRate = 0.00005f;  // ✅ very slow decrease
+    public float sleepDecreaseRate  = 0.00005f;  // ✅ very slow decrease
+    public float showerDecreaseRate = 0.00005f;  // ✅ very slow decrease
+
+    
 
     // ✅ track actual recorded samples
     private int recordedSamples = 0;
@@ -77,6 +83,17 @@ public class PlayerManager : MonoBehaviour
 
     void Update()
     {
+        // ✅ Slowly decrease all bars over time
+        if (storeManager.kitchenProgressBar.fillAmount > 0)
+            storeManager.kitchenProgressBar.fillAmount -= hungerDecreaseRate * Time.deltaTime;
+
+        if (sleepProgressBar.fillAmount > 0 && !isSleeping)
+            sleepProgressBar.fillAmount -= sleepDecreaseRate * Time.deltaTime;
+
+        if (showerManager.showerProgressImage.fillAmount > 0)
+            showerManager.showerProgressImage.fillAmount -= showerDecreaseRate * Time.deltaTime;
+
+        
         // ✅ Body hit detection
         if (Input.GetMouseButtonDown(0))
         {

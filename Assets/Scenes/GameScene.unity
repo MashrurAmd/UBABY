@@ -5064,7 +5064,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &274470100
 RectTransform:
   m_ObjectHideFlags: 0
@@ -30317,7 +30317,6 @@ MonoBehaviour:
   - Relax
   leftButton: {fileID: 401106962}
   rightButton: {fileID: 866689898}
-  categoryButtonAudio: {fileID: 0}
   glassesButtonImage: {fileID: 623234150}
   watchButtonImage: {fileID: 1545023823}
   hatButtonImage: {fileID: 951265007}
@@ -40711,6 +40710,9 @@ MonoBehaviour:
   sleepSound2: {fileID: 930137795}
   mouthRadius: 200
   grabRadiusMultiplier: 4
+  hungerDecreaseRate: 0.00005
+  sleepDecreaseRate: 0.00005
+  showerDecreaseRate: 0.00005
   isSleeping: 0
 --- !u!4 &1244426636
 Transform:
@@ -40871,6 +40873,7 @@ MonoBehaviour:
   hungerThreshold: 0.5
   sleepThreshold: 0.5
   showerThreshold: 0.5
+  cooldownBetweenPopups: 120
   hungryCooldown: 20
   playerAnimator: {fileID: 1826472111}
 --- !u!114 &1244426643

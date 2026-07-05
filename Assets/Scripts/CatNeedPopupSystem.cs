@@ -51,6 +51,13 @@ IEnumerator NeedsRoutine()
             continue;
         }
 
+        // ✅ Skip all popups if player is sleeping
+        if (playerManager.isSleeping)
+        {
+            yield return null;
+            continue;
+        }
+
         // ✅ Global cooldown check
         if (Time.time - lastPopupTime < cooldownBetweenPopups)
         {
@@ -60,20 +67,24 @@ IEnumerator NeedsRoutine()
 
         if (!popupActive)
         {
-            // --- HUNGER ---
+            // --- HUNGER --- ✅ skip if sleeping
             if (storeManager.kitchenProgressBar.fillAmount < hungerThreshold)
             {
                 popupActive = true;
                 yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
-                ShowPopup("I am hungry 😿", hungryClip);
 
-                if (Time.time - lastHungryAnimTime >= hungryCooldown)
+                // ✅ Check again after delay in case player fell asleep during wait
+                if (!playerManager.isSleeping)
                 {
-                    playerAnimator.SetTrigger("Hungry");
-                    lastHungryAnimTime = Time.time;
-                }
+                    ShowPopup("I am hungry 😿", hungryClip);
 
-                lastPopupTime = Time.time; // ✅ update last popup time
+                    if (Time.time - lastHungryAnimTime >= hungryCooldown)
+                    {
+                        playerAnimator.SetTrigger("Hungry");
+                        lastHungryAnimTime = Time.time;
+                    }
+                    lastPopupTime = Time.time;
+                }
                 popupActive = false;
             }
 
@@ -83,17 +94,22 @@ IEnumerator NeedsRoutine()
                 popupActive = true;
                 yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
                 ShowPopup("I want to sleep 💤", sleepClip);
-                lastPopupTime = Time.time; // ✅
+                lastPopupTime = Time.time;
                 popupActive = false;
             }
 
-            // --- SHOWER ---
+            // --- SHOWER --- ✅ skip if sleeping
             if (showerManager.showerProgressImage.fillAmount < showerThreshold)
             {
                 popupActive = true;
                 yield return new WaitForSeconds(Random.Range(minDelay, maxDelay));
-                ShowPopup("I need shower 🚿", showerClip);
-                lastPopupTime = Time.time; // ✅
+
+                // ✅ Check again after delay in case player fell asleep during wait
+                if (!playerManager.isSleeping)
+                {
+                    ShowPopup("I need shower 🚿", showerClip);
+                    lastPopupTime = Time.time;
+                }
                 popupActive = false;
             }
 
@@ -102,7 +118,7 @@ IEnumerator NeedsRoutine()
             {
                 popupActive = true;
                 ShowPopup("I am full 😺", fullClip, false);
-                lastPopupTime = Time.time; // ✅
+                lastPopupTime = Time.time;
                 popupActive = false;
             }
 
@@ -111,7 +127,7 @@ IEnumerator NeedsRoutine()
             {
                 popupActive = true;
                 ShowPopup("Sleep done 😴", fullClip, false);
-                lastPopupTime = Time.time; // ✅
+                lastPopupTime = Time.time;
                 popupActive = false;
             }
 
@@ -120,7 +136,7 @@ IEnumerator NeedsRoutine()
             {
                 popupActive = true;
                 ShowPopup("Shower done 🚿", fullClip, false);
-                lastPopupTime = Time.time; // ✅
+                lastPopupTime = Time.time;
                 popupActive = false;
             }
         }

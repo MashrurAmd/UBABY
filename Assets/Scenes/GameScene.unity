@@ -5064,7 +5064,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &274470100
 RectTransform:
   m_ObjectHideFlags: 0
@@ -30317,6 +30317,7 @@ MonoBehaviour:
   - Relax
   leftButton: {fileID: 401106962}
   rightButton: {fileID: 866689898}
+  categoryButtonAudio: {fileID: 0}
   glassesButtonImage: {fileID: 623234150}
   watchButtonImage: {fileID: 1545023823}
   hatButtonImage: {fileID: 951265007}

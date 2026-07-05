@@ -50,6 +50,46 @@ public class WardrobeManager : MonoBehaviour
     private ActiveCategory activeCategory = ActiveCategory.None;
 
     // ===========================
+    // 💾 SAVE / LOAD (PlayerPrefs)
+    // ===========================
+    private const string PP_GLASSES = "Wardrobe_GlassIndex";
+    private const string PP_WATCH = "Wardrobe_WatchIndex";
+    private const string PP_HAT = "Wardrobe_HatIndex";
+    private const string PP_DRESS = "Wardrobe_DressIndex";
+
+    void Start()
+    {
+        LoadWardrobe();
+    }
+
+    // Reads the saved indices and re-activates the correct item GameObjects
+    // so equipped items are still visible after the game is closed and reopened.
+    void LoadWardrobe()
+    {
+        currentGlassIndex = PlayerPrefs.GetInt(PP_GLASSES, -1);
+        currentWatchIndex = PlayerPrefs.GetInt(PP_WATCH, -1);
+        currentHatIndex = PlayerPrefs.GetInt(PP_HAT, -1);
+        currentDressIndex = PlayerPrefs.GetInt(PP_DRESS, -1);
+
+        for (int i = 0; i < glasses.Length; i++) glasses[i].SetActive(false);
+        for (int i = 0; i < watches.Length; i++) watches[i].SetActive(false);
+        for (int i = 0; i < hats.Length; i++) hats[i].SetActive(false);
+        for (int i = 0; i < dresses.Length; i++) dresses[i].SetActive(false);
+
+        if (currentGlassIndex >= 0 && currentGlassIndex < glasses.Length)
+            glasses[currentGlassIndex].SetActive(true);
+
+        if (currentWatchIndex >= 0 && currentWatchIndex < watches.Length)
+            watches[currentWatchIndex].SetActive(true);
+
+        if (currentHatIndex >= 0 && currentHatIndex < hats.Length)
+            hats[currentHatIndex].SetActive(true);
+
+        if (currentDressIndex >= 0 && currentDressIndex < dresses.Length)
+            dresses[currentDressIndex].SetActive(true);
+    }
+
+    // ===========================
     // 👓 GLASSES
     // ===========================
 
@@ -96,6 +136,9 @@ public class WardrobeManager : MonoBehaviour
 
         if (glassesNames.Length > index)
             glassesNameText.text = glassesNames[index];
+
+        PlayerPrefs.SetInt(PP_GLASSES, index);
+        PlayerPrefs.Save();
     }
 
     public void HideAllGlasses()
@@ -106,6 +149,9 @@ public class WardrobeManager : MonoBehaviour
         glassesNameText.text = "";
         currentGlassIndex = -1;
         glassesButtonImage.sprite = glassesInactiveSprite;
+
+        PlayerPrefs.SetInt(PP_GLASSES, -1);
+        PlayerPrefs.Save();
     }
 
     // ===========================
@@ -155,6 +201,9 @@ public class WardrobeManager : MonoBehaviour
 
         if (watchNames.Length > index)
             watchNameText.text = watchNames[index];
+
+        PlayerPrefs.SetInt(PP_WATCH, index);
+        PlayerPrefs.Save();
     }
 
     public void HideAllWatches()
@@ -165,6 +214,9 @@ public class WardrobeManager : MonoBehaviour
         watchNameText.text = "";
         currentWatchIndex = -1;
         watchButtonImage.sprite = watchInactiveSprite;
+
+        PlayerPrefs.SetInt(PP_WATCH, -1);
+        PlayerPrefs.Save();
     }
 
     // ===========================
@@ -214,6 +266,9 @@ public class WardrobeManager : MonoBehaviour
 
         if (hatNames.Length > index)
             hatNameText.text = hatNames[index];
+
+        PlayerPrefs.SetInt(PP_HAT, index);
+        PlayerPrefs.Save();
     }
 
     public void HideAllHats()
@@ -224,6 +279,9 @@ public class WardrobeManager : MonoBehaviour
         hatNameText.text = "";
         currentHatIndex = -1;
         hatButtonImage.sprite = hatInactiveSprite;
+
+        PlayerPrefs.SetInt(PP_HAT, -1);
+        PlayerPrefs.Save();
     }
 
     // ===========================
@@ -273,6 +331,9 @@ public class WardrobeManager : MonoBehaviour
 
         if (dressNames.Length > index)
             dressNameText.text = dressNames[index];
+
+        PlayerPrefs.SetInt(PP_DRESS, index);
+        PlayerPrefs.Save();
     }
 
     public void HideAllDresses()
@@ -283,6 +344,9 @@ public class WardrobeManager : MonoBehaviour
         dressNameText.text = "";
         currentDressIndex = -1;
         dressButtonImage.sprite = dressInactiveSprite;
+
+        PlayerPrefs.SetInt(PP_DRESS, -1);
+        PlayerPrefs.Save();
     }
 
     // ===========================

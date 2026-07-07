@@ -23,7 +23,7 @@ public class BallController : MonoBehaviour
     private void OnEnable()
     {
         if (rb == null) rb = GetComponent<Rigidbody>();
-        rb.velocity = Vector3.zero;
+        rb.linearVelocity = Vector3.zero;
         isPlaced = false;
         hasTriggeredPower = false;
 

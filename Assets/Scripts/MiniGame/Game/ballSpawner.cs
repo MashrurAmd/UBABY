@@ -86,7 +86,7 @@ public class BallSpawner : MonoBehaviour
             GameObject newBall = ObjectPooler.Instance.SpawnFromPool(randomTag, spawnPos, Quaternion.identity);
 
             Rigidbody rb = newBall.GetComponent<Rigidbody>();
-            if (rb != null) rb.velocity = Vector3.zero;
+            if (rb != null) rb.linearVelocity = Vector3.zero;
 
             BallController ballCtrl = newBall.GetComponent<BallController>();
             if (ballCtrl != null) ballCtrl.enabled = false;

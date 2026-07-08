@@ -175,6 +175,7 @@ public class PlayerManager : MonoBehaviour
         bedRommButtom.SetActive(true);
         wardrobeButton.SetActive(true);
         wardrobeUI.SetActive(false);
+        playerAnimator.SetBool("LyingOnBed", false); 
 
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
@@ -207,6 +208,7 @@ public class PlayerManager : MonoBehaviour
         bedRommButtom.SetActive(true);
         wardrobeButton.SetActive(true);
         wardrobeUI.SetActive(false);
+        playerAnimator.SetBool("LyingOnBed", false); 
 
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
@@ -240,6 +242,7 @@ public class PlayerManager : MonoBehaviour
         bedRommButtom.SetActive(true);
         wardrobeButton.SetActive(true);
         wardrobeUI.SetActive(false);
+        playerAnimator.SetBool("LyingOnBed", false); 
 
         switchAudio.Play();
         player.transform.parent = myCamera.transform;
@@ -287,12 +290,15 @@ public class PlayerManager : MonoBehaviour
         showerBottomUI.SetActive(false);
         sleepButton.SetActive(true);
 
+        // ✅ Enter lying animation when entering bedroom
+        playerAnimator.SetBool("LyingOnBed", true);
+        playerAnimator.SetBool("Sleep", false);
+
         officeButton.GetComponent<Image>().enabled = false;
         kitchenButton.GetComponent<Image>().enabled = false;
         showerButton.GetComponent<Image>().enabled = false;
         bedRommButtom.GetComponent<Image>().enabled = true;
     }
-
     public void GoWardrobe()
     {
         currentRoom = wardrobe;
@@ -310,6 +316,7 @@ public class PlayerManager : MonoBehaviour
         showerBottomUI.SetActive(false);
         sleepButton.SetActive(false);
         wardrobeUI.SetActive(true);
+        playerAnimator.SetBool("LyingOnBed", false); 
         WakeUp();
 
         officeButton.SetActive(false);
@@ -376,7 +383,8 @@ public class PlayerManager : MonoBehaviour
         {
             isSleeping = true;
             playerAnimator.ResetTrigger("Hungry");
-            playerAnimator.SetBool("Sleep", true);
+            playerAnimator.SetBool("LyingOnBed", false); // ✅ exit lying
+            playerAnimator.SetBool("Sleep", true);        // ✅ enter sleep
             sleepButtonText.text = "Wake Up";
             sleepBG.SetActive(true);
             sleepParticleEffect.SetActive(true);
@@ -392,7 +400,14 @@ public class PlayerManager : MonoBehaviour
     void WakeUp()
     {
         isSleeping = false;
-        playerAnimator.SetBool("Sleep", false);
+        playerAnimator.SetBool("Sleep", false);           // ✅ exit sleep
+
+        // ✅ Go back to lying if still in bedroom
+        if (currentRoom == bedroom)
+            playerAnimator.SetBool("LyingOnBed", true);  // ✅ back to lying
+        else
+            playerAnimator.SetBool("LyingOnBed", false);
+
         sleepButtonText.text = "Sleep";
         sleepBG.SetActive(false);
         sleepParticleEffect.SetActive(false);

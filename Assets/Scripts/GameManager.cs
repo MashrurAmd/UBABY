@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -57,5 +57,20 @@ public class GameManager : MonoBehaviour
 
         FirebaseUserDataManager.Instance.SaveCoins(currentCoins - amount);
         return true;
+    }
+
+    [Header("Website")]
+    public string websiteURL = "https://babyu.tech/topup";
+
+    public void VisitWebsite()
+    {
+        if (!string.IsNullOrEmpty(websiteURL))
+        {
+            Application.OpenURL(websiteURL);
+        }
+        else
+        {
+            Debug.LogWarning("Website URL is empty!");
+        }
     }
 }

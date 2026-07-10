@@ -39592,8 +39592,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1244426639}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: AddCoins
-        m_Mode: 3
+        m_MethodName: VisitWebsite
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -41119,6 +41119,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentCoins: 85555555
   currentCoinsText: {fileID: 921884564}
+  websiteURL: https://babyu.tech/topup
 --- !u!114 &1244426640
 MonoBehaviour:
   m_ObjectHideFlags: 0

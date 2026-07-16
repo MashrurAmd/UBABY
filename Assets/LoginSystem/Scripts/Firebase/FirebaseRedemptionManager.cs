@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using Firebase;
 using Firebase.Auth;
@@ -37,10 +37,26 @@ public class FirebaseRedemptionManager : MonoBehaviour
         }
 
         auth = FirebaseAuth.DefaultInstance;
-        dbRef = FirebaseDatabase.DefaultInstance.RootReference;
+        
+        FirebaseApp app = FirebaseApp.DefaultInstance;
+        if (app != null)
+        {
+            dbRef = FirebaseDatabase.GetInstance(app).RootReference;
+        }
+        else
+        {
+            dbRef = FirebaseDatabase.DefaultInstance.RootReference;
+        }
 
-        FirebaseUserDataManager.Instance.OnCoinsUpdated += UpdateCoinsUI;
-        UpdateCoinsUI(FirebaseUserDataManager.Instance.currentCoins);
+        if (FirebaseUserDataManager.Instance != null)
+        {
+            FirebaseUserDataManager.Instance.OnCoinsUpdated += UpdateCoinsUI;
+            UpdateCoinsUI(FirebaseUserDataManager.Instance.currentCoins);
+        }
+        else
+        {
+            Debug.LogWarning("FirebaseUserDataManager.Instance is null during initialization.");
+        }
     }
 
     void OnDestroy()
@@ -59,6 +75,34 @@ public class FirebaseRedemptionManager : MonoBehaviour
         if (string.IsNullOrEmpty(code))
         {
             ShowPopup("Enter code ❌", Color.red);
+            yield break;
+        }
+
+        if (auth == null)
+        {
+            auth = FirebaseAuth.DefaultInstance;
+        }
+
+        if (auth == null || auth.CurrentUser == null)
+        {
+            ShowPopup("Not Logged In ❌", Color.red);
+            Debug.LogError("Cannot redeem code: Firebase Auth or CurrentUser is null.");
+            yield break;
+        }
+
+        if (dbRef == null)
+        {
+            FirebaseApp app = FirebaseApp.DefaultInstance;
+            if (app != null)
+            {
+                dbRef = FirebaseDatabase.GetInstance(app).RootReference;
+            }
+        }
+
+        if (dbRef == null)
+        {
+            ShowPopup("Database Error ❌", Color.red);
+            Debug.LogError("Cannot redeem code: Firebase Database Reference is null.");
             yield break;
         }
 
@@ -88,7 +132,16 @@ public class FirebaseRedemptionManager : MonoBehaviour
         dbRef.Child("RedemptionCodes").Child(code).Child("redeemedBy").SetValueAsync(uid);
         dbRef.Child("RedemptionCodes").Child(code).Child("usedAt").SetValueAsync(serverTime);
 
-        FirebaseUserDataManager.Instance.AddCoins(coins);
+        if (FirebaseUserDataManager.Instance != null)
+        {
+            FirebaseUserDataManager.Instance.AddCoins(coins);
+        }
+        else
+        {
+            Debug.LogError("FirebaseUserDataManager.Instance is null. Unable to add redeemed coins.");
+            ShowPopup("Error Adding Coins ❌", Color.red);
+            yield break;
+        }
 
         ShowPopup("+" + coins + " 💰", Color.green);
         redemptionInput.text = "";

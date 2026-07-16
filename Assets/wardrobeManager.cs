@@ -13,8 +13,22 @@ public class WardrobeManager : MonoBehaviour
     public AudioSource watchSound;    // drag watch change sound here
     public AudioSource hatSound;      // drag hat change sound here
     public AudioSource dressSound;    // drag dress change sound here
-    
-    
+
+    [Header("Shop UI")]
+    public Text priceText;          // shows price of current item
+    public Text statusText;         // shows "Owned" or price
+    public GameObject buyButton;    // the buy button
+
+    [Header("Prices")]
+    public int[] glassesPrices;  // set prices in Inspector for each glass
+    public int[] watchPrices;    // set prices in Inspector for each watch
+    public int[] hatPrices;      // set prices in Inspector for each hat
+    public int[] dressPrices;    // set prices in Inspector for each dress
+
+    [Header("References")]
+    public GameManager gameManager;       // drag GameManager here
+    public GameObject notEnoughCoinsUI;   // drag a popup UI here
+
     [Header("Hats")]
     public GameObject[] hats;
     public Text hatNameText;
@@ -26,9 +40,9 @@ public class WardrobeManager : MonoBehaviour
     public string[] watchNames;
 
     [Header("Dresses")]
-    public GameObject[] dresses;        // ✅ drag 3 dresses here
-    public Text dressNameText;          // ✅ text to show dress name
-    public string[] dressNames;         // ✅ names like "Red Dress", "Blue Dress" etc
+    public GameObject[] dresses;        // drag 3 dresses here
+    public Text dressNameText;          // text to show dress name
+    public string[] dressNames;         // names like "Red Dress", "Blue Dress" etc
 
     [Header("Navigation Buttons")]
     public GameObject leftButton;
@@ -38,22 +52,24 @@ public class WardrobeManager : MonoBehaviour
     public Image glassesButtonImage;
     public Image watchButtonImage;
     public Image hatButtonImage;
-    public Image dressButtonImage;      // ✅ dress button image
+    public Image dressButtonImage;
     public Sprite glassesActiveSprite;
     public Sprite glassesInactiveSprite;
     public Sprite watchActiveSprite;
     public Sprite watchInactiveSprite;
     public Sprite hatActiveSprite;
     public Sprite hatInactiveSprite;
-    public Sprite dressActiveSprite;    // ✅ dress active sprite
-    public Sprite dressInactiveSprite;  // ✅ dress inactive sprite
+    public Sprite dressActiveSprite;
+    public Sprite dressInactiveSprite;
 
+    // -1 means "None" (nothing equipped) for every category, and is a
+    // valid, reachable state via the left/right browse buttons.
     private int currentGlassIndex = -1;
     private int currentWatchIndex = -1;
     private int currentHatIndex = -1;
-    private int currentDressIndex = -1; // ✅
+    private int currentDressIndex = -1;
 
-    private enum ActiveCategory { None, Glasses, Watch, Hat, Dress } // ✅ add Dress
+    private enum ActiveCategory { None, Glasses, Watch, Hat, Dress }
     private ActiveCategory activeCategory = ActiveCategory.None;
 
     // ===========================
@@ -64,9 +80,34 @@ public class WardrobeManager : MonoBehaviour
     private const string PP_HAT = "Wardrobe_HatIndex";
     private const string PP_DRESS = "Wardrobe_DressIndex";
 
+    public static WardrobeManager Instance;
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
     void Start()
     {
         LoadWardrobe();
+    }
+
+    private void OnDisable()
+    {
+        RevertToSaved();
+    }
+
+    public void RevertToSaved()
+    {
+        LoadWardrobe();
+        activeCategory = ActiveCategory.None;
+        if (leftButton != null) leftButton.SetActive(false);
+        if (rightButton != null) rightButton.SetActive(false);
+
+        if (glassesButtonImage != null && glassesInactiveSprite != null) glassesButtonImage.sprite = glassesInactiveSprite;
+        if (watchButtonImage != null && watchInactiveSprite != null) watchButtonImage.sprite = watchInactiveSprite;
+        if (hatButtonImage != null && hatInactiveSprite != null) hatButtonImage.sprite = hatInactiveSprite;
+        if (dressButtonImage != null && dressInactiveSprite != null) dressButtonImage.sprite = dressInactiveSprite;
     }
 
     // Reads the saved indices and re-activates the correct item GameObjects
@@ -78,22 +119,37 @@ public class WardrobeManager : MonoBehaviour
         currentHatIndex = PlayerPrefs.GetInt(PP_HAT, -1);
         currentDressIndex = PlayerPrefs.GetInt(PP_DRESS, -1);
 
-        for (int i = 0; i < glasses.Length; i++) glasses[i].SetActive(false);
-        for (int i = 0; i < watches.Length; i++) watches[i].SetActive(false);
-        for (int i = 0; i < hats.Length; i++) hats[i].SetActive(false);
-        for (int i = 0; i < dresses.Length; i++) dresses[i].SetActive(false);
+        if (glasses != null)
+        {
+            for (int i = 0; i < glasses.Length; i++)
+                if (glasses[i] != null) glasses[i].SetActive(false);
+            if (currentGlassIndex >= 0 && currentGlassIndex < glasses.Length && glasses[currentGlassIndex] != null)
+                glasses[currentGlassIndex].SetActive(true);
+        }
 
-        if (currentGlassIndex >= 0 && currentGlassIndex < glasses.Length)
-            glasses[currentGlassIndex].SetActive(true);
+        if (watches != null)
+        {
+            for (int i = 0; i < watches.Length; i++)
+                if (watches[i] != null) watches[i].SetActive(false);
+            if (currentWatchIndex >= 0 && currentWatchIndex < watches.Length && watches[currentWatchIndex] != null)
+                watches[currentWatchIndex].SetActive(true);
+        }
 
-        if (currentWatchIndex >= 0 && currentWatchIndex < watches.Length)
-            watches[currentWatchIndex].SetActive(true);
+        if (hats != null)
+        {
+            for (int i = 0; i < hats.Length; i++)
+                if (hats[i] != null) hats[i].SetActive(false);
+            if (currentHatIndex >= 0 && currentHatIndex < hats.Length && hats[currentHatIndex] != null)
+                hats[currentHatIndex].SetActive(true);
+        }
 
-        if (currentHatIndex >= 0 && currentHatIndex < hats.Length)
-            hats[currentHatIndex].SetActive(true);
-
-        if (currentDressIndex >= 0 && currentDressIndex < dresses.Length)
-            dresses[currentDressIndex].SetActive(true);
+        if (dresses != null)
+        {
+            for (int i = 0; i < dresses.Length; i++)
+                if (dresses[i] != null) dresses[i].SetActive(false);
+            if (currentDressIndex >= 0 && currentDressIndex < dresses.Length && dresses[currentDressIndex] != null)
+                dresses[currentDressIndex].SetActive(true);
+        }
     }
 
     // ===========================
@@ -110,10 +166,11 @@ public class WardrobeManager : MonoBehaviour
         glassesButtonImage.sprite = glassesActiveSprite;
         watchButtonImage.sprite = watchInactiveSprite;
         hatButtonImage.sprite = hatInactiveSprite;
-        dressButtonImage.sprite = dressInactiveSprite; // ✅
+        dressButtonImage.sprite = dressInactiveSprite;
 
-        // Just refresh the display for whatever is currently equipped (including None)
-        ShowGlass(currentGlassIndex);
+        // Show whatever is currently equipped, including "None" (-1) —
+        // don't force the player onto item 0 just for opening the tab.
+        RefreshGlassInfo(currentGlassIndex);
     }
 
     public void NextGlass()
@@ -121,7 +178,8 @@ public class WardrobeManager : MonoBehaviour
         currentGlassIndex++;
         if (currentGlassIndex >= glasses.Length)
             currentGlassIndex = -1; // wrap around to None
-        ShowGlass(currentGlassIndex);
+        RefreshGlassInfo(currentGlassIndex);
+        PlayCategorySound(glassesSound);
     }
 
     public void PreviousGlass()
@@ -129,34 +187,58 @@ public class WardrobeManager : MonoBehaviour
         currentGlassIndex--;
         if (currentGlassIndex < -1)
             currentGlassIndex = glasses.Length - 1;
-        ShowGlass(currentGlassIndex);
+        RefreshGlassInfo(currentGlassIndex);
+        PlayCategorySound(glassesSound);
     }
 
-    // index == -1 means "None" selected
-    void ShowGlass(int index)
+    // Browsing previews the item and shows price/owned status.
+    // index == -1 means "None" — nothing equipped in this category.
+    // Equipping an unowned item happens only after BuyGlass() succeeds.
+    void RefreshGlassInfo(int index)
     {
         for (int i = 0; i < glasses.Length; i++)
             glasses[i].SetActive(false);
 
+        currentGlassIndex = index;
+
         if (index == -1)
         {
             glassesNameText.text = "None";
+            priceText.text = "";
+            buyButton.SetActive(false);
+
+            PlayerPrefs.SetInt(PP_GLASSES, -1);
+            PlayerPrefs.Save();
+            return;
+        }
+
+        glasses[index].SetActive(true);
+
+        if (IsGlassPurchased(index))
+        {
+            priceText.text = "Owned ✅";
+            buyButton.SetActive(false);
+
+            // Already owned items are free to wear — equip them as soon
+            // as the player browses to them.
+            PlayerPrefs.SetInt(PP_GLASSES, index);
+            PlayerPrefs.Save();
         }
         else
         {
-            glasses[index].SetActive(true);
-            if (glassesNames.Length > index)
-                glassesNameText.text = glassesNames[index];
+            int price = glassesPrices.Length > index ? glassesPrices[index] : 0;
+            priceText.text = price + " 🪙";
+            buyButton.SetActive(true);
         }
 
-        currentGlassIndex = index;
-        PlayerPrefs.SetInt(PP_GLASSES, index);
-        PlayerPrefs.Save();
+        if (glassesNames.Length > index)
+            glassesNameText.text = glassesNames[index];
     }
 
+    // Explicit "take off" call (e.g. wired to a dedicated remove button).
     public void HideAllGlasses()
     {
-        ShowGlass(-1);
+        RefreshGlassInfo(-1);
         glassesButtonImage.sprite = glassesInactiveSprite;
     }
 
@@ -174,9 +256,9 @@ public class WardrobeManager : MonoBehaviour
         watchButtonImage.sprite = watchActiveSprite;
         glassesButtonImage.sprite = glassesInactiveSprite;
         hatButtonImage.sprite = hatInactiveSprite;
-        dressButtonImage.sprite = dressInactiveSprite; // ✅
+        dressButtonImage.sprite = dressInactiveSprite;
 
-        ShowWatch(currentWatchIndex);
+        RefreshWatchInfo(currentWatchIndex);
     }
 
     public void NextWatch()
@@ -184,7 +266,8 @@ public class WardrobeManager : MonoBehaviour
         currentWatchIndex++;
         if (currentWatchIndex >= watches.Length)
             currentWatchIndex = -1; // wrap around to None
-        ShowWatch(currentWatchIndex);
+        RefreshWatchInfo(currentWatchIndex);
+        PlayCategorySound(watchSound);
     }
 
     public void PreviousWatch()
@@ -192,34 +275,52 @@ public class WardrobeManager : MonoBehaviour
         currentWatchIndex--;
         if (currentWatchIndex < -1)
             currentWatchIndex = watches.Length - 1;
-        ShowWatch(currentWatchIndex);
+        RefreshWatchInfo(currentWatchIndex);
+        PlayCategorySound(watchSound);
     }
 
-    // index == -1 means "None" selected
-    void ShowWatch(int index)
+    void RefreshWatchInfo(int index)
     {
         for (int i = 0; i < watches.Length; i++)
             watches[i].SetActive(false);
 
+        currentWatchIndex = index;
+
         if (index == -1)
         {
             watchNameText.text = "None";
+            priceText.text = "";
+            buyButton.SetActive(false);
+
+            PlayerPrefs.SetInt(PP_WATCH, -1);
+            PlayerPrefs.Save();
+            return;
+        }
+
+        watches[index].SetActive(true);
+
+        if (IsWatchPurchased(index))
+        {
+            priceText.text = "Owned ✅";
+            buyButton.SetActive(false);
+
+            PlayerPrefs.SetInt(PP_WATCH, index);
+            PlayerPrefs.Save();
         }
         else
         {
-            watches[index].SetActive(true);
-            if (watchNames.Length > index)
-                watchNameText.text = watchNames[index];
+            int price = watchPrices.Length > index ? watchPrices[index] : 0;
+            priceText.text = price + " 🪙";
+            buyButton.SetActive(true);
         }
 
-        currentWatchIndex = index;
-        PlayerPrefs.SetInt(PP_WATCH, index);
-        PlayerPrefs.Save();
+        if (watchNames.Length > index)
+            watchNameText.text = watchNames[index];
     }
 
     public void HideAllWatches()
     {
-        ShowWatch(-1);
+        RefreshWatchInfo(-1);
         watchButtonImage.sprite = watchInactiveSprite;
     }
 
@@ -237,9 +338,9 @@ public class WardrobeManager : MonoBehaviour
         hatButtonImage.sprite = hatActiveSprite;
         glassesButtonImage.sprite = glassesInactiveSprite;
         watchButtonImage.sprite = watchInactiveSprite;
-        dressButtonImage.sprite = dressInactiveSprite; // ✅
+        dressButtonImage.sprite = dressInactiveSprite;
 
-        ShowHat(currentHatIndex);
+        RefreshHatInfo(currentHatIndex);
     }
 
     public void NextHat()
@@ -247,7 +348,8 @@ public class WardrobeManager : MonoBehaviour
         currentHatIndex++;
         if (currentHatIndex >= hats.Length)
             currentHatIndex = -1; // wrap around to None
-        ShowHat(currentHatIndex);
+        RefreshHatInfo(currentHatIndex);
+        PlayCategorySound(hatSound);
     }
 
     public void PreviousHat()
@@ -255,34 +357,52 @@ public class WardrobeManager : MonoBehaviour
         currentHatIndex--;
         if (currentHatIndex < -1)
             currentHatIndex = hats.Length - 1;
-        ShowHat(currentHatIndex);
+        RefreshHatInfo(currentHatIndex);
+        PlayCategorySound(hatSound);
     }
 
-    // index == -1 means "None" selected
-    void ShowHat(int index)
+    void RefreshHatInfo(int index)
     {
         for (int i = 0; i < hats.Length; i++)
             hats[i].SetActive(false);
 
+        currentHatIndex = index;
+
         if (index == -1)
         {
             hatNameText.text = "None";
+            priceText.text = "";
+            buyButton.SetActive(false);
+
+            PlayerPrefs.SetInt(PP_HAT, -1);
+            PlayerPrefs.Save();
+            return;
+        }
+
+        hats[index].SetActive(true);
+
+        if (IsHatPurchased(index))
+        {
+            priceText.text = "Owned ✅";
+            buyButton.SetActive(false);
+
+            PlayerPrefs.SetInt(PP_HAT, index);
+            PlayerPrefs.Save();
         }
         else
         {
-            hats[index].SetActive(true);
-            if (hatNames.Length > index)
-                hatNameText.text = hatNames[index];
+            int price = hatPrices.Length > index ? hatPrices[index] : 0;
+            priceText.text = price + " 🪙";
+            buyButton.SetActive(true);
         }
 
-        currentHatIndex = index;
-        PlayerPrefs.SetInt(PP_HAT, index);
-        PlayerPrefs.Save();
+        if (hatNames.Length > index)
+            hatNameText.text = hatNames[index];
     }
 
     public void HideAllHats()
     {
-        ShowHat(-1);
+        RefreshHatInfo(-1);
         hatButtonImage.sprite = hatInactiveSprite;
     }
 
@@ -302,7 +422,7 @@ public class WardrobeManager : MonoBehaviour
         watchButtonImage.sprite = watchInactiveSprite;
         hatButtonImage.sprite = hatInactiveSprite;
 
-        ShowDress(currentDressIndex);
+        RefreshDressInfo(currentDressIndex);
     }
 
     public void NextDress()
@@ -310,7 +430,8 @@ public class WardrobeManager : MonoBehaviour
         currentDressIndex++;
         if (currentDressIndex >= dresses.Length)
             currentDressIndex = -1; // wrap around to None
-        ShowDress(currentDressIndex);
+        RefreshDressInfo(currentDressIndex);
+        PlayCategorySound(dressSound);
     }
 
     public void PreviousDress()
@@ -318,35 +439,204 @@ public class WardrobeManager : MonoBehaviour
         currentDressIndex--;
         if (currentDressIndex < -1)
             currentDressIndex = dresses.Length - 1;
-        ShowDress(currentDressIndex);
+        RefreshDressInfo(currentDressIndex);
+        PlayCategorySound(dressSound);
     }
 
-    // index == -1 means "None" selected
-    void ShowDress(int index)
+    void RefreshDressInfo(int index)
     {
         for (int i = 0; i < dresses.Length; i++)
             dresses[i].SetActive(false);
 
+        currentDressIndex = index;
+
         if (index == -1)
         {
             dressNameText.text = "None";
+            priceText.text = "";
+            buyButton.SetActive(false);
+
+            PlayerPrefs.SetInt(PP_DRESS, -1);
+            PlayerPrefs.Save();
+            return;
+        }
+
+        dresses[index].SetActive(true);
+
+        if (IsDressPurchased(index))
+        {
+            priceText.text = "Owned ✅";
+            buyButton.SetActive(false);
+
+            PlayerPrefs.SetInt(PP_DRESS, index);
+            PlayerPrefs.Save();
         }
         else
         {
-            dresses[index].SetActive(true);
-            if (dressNames.Length > index)
-                dressNameText.text = dressNames[index];
+            int price = dressPrices.Length > index ? dressPrices[index] : 0;
+            priceText.text = price + " 🪙";
+            buyButton.SetActive(true);
         }
 
-        currentDressIndex = index;
-        PlayerPrefs.SetInt(PP_DRESS, index);
-        PlayerPrefs.Save();
+        if (dressNames.Length > index)
+            dressNameText.text = dressNames[index];
     }
 
     public void HideAllDresses()
     {
-        ShowDress(-1);
+        RefreshDressInfo(-1);
         dressButtonImage.sprite = dressInactiveSprite;
+    }
+
+    // ===========================
+    // 🛒 BUY BUTTON
+    // ===========================
+
+    public void BuyCurrentItem()
+    {
+        switch (activeCategory)
+        {
+            case ActiveCategory.Glasses: BuyGlass(currentGlassIndex); break;
+            case ActiveCategory.Watch: BuyWatch(currentWatchIndex); break;
+            case ActiveCategory.Hat: BuyHat(currentHatIndex); break;
+            case ActiveCategory.Dress: BuyDress(currentDressIndex); break;
+        }
+    }
+
+    void BuyGlass(int index)
+    {
+        if (index < 0) return;
+        if (IsGlassPurchased(index)) return; // already owned, nothing to buy
+
+        int price = glassesPrices.Length > index ? glassesPrices[index] : 0;
+        if (gameManager.SpendCoins(price))
+        {
+            MarkGlassPurchased(index);
+            priceText.text = "Owned ✅";
+            buyButton.SetActive(false);
+            PlayerPrefs.SetInt(PP_GLASSES, index);
+            PlayerPrefs.Save();
+            Debug.Log("✅ Glass purchased!");
+        }
+        else
+        {
+            notEnoughCoinsUI.SetActive(true);
+            Debug.Log("❌ Not enough coins!");
+        }
+    }
+
+    void BuyWatch(int index)
+    {
+        if (index < 0) return;
+        if (IsWatchPurchased(index)) return;
+
+        int price = watchPrices.Length > index ? watchPrices[index] : 0;
+        if (gameManager.SpendCoins(price))
+        {
+            MarkWatchPurchased(index);
+            priceText.text = "Owned ✅";
+            buyButton.SetActive(false);
+            PlayerPrefs.SetInt(PP_WATCH, index);
+            PlayerPrefs.Save();
+            Debug.Log("✅ Watch purchased!");
+        }
+        else
+        {
+            notEnoughCoinsUI.SetActive(true);
+            Debug.Log("❌ Not enough coins!");
+        }
+    }
+
+    void BuyHat(int index)
+    {
+        if (index < 0) return;
+        if (IsHatPurchased(index)) return;
+
+        int price = hatPrices.Length > index ? hatPrices[index] : 0;
+        if (gameManager.SpendCoins(price))
+        {
+            MarkHatPurchased(index);
+            priceText.text = "Owned ✅";
+            buyButton.SetActive(false);
+            PlayerPrefs.SetInt(PP_HAT, index);
+            PlayerPrefs.Save();
+            Debug.Log("✅ Hat purchased!");
+        }
+        else
+        {
+            notEnoughCoinsUI.SetActive(true);
+            Debug.Log("❌ Not enough coins!");
+        }
+    }
+
+    void BuyDress(int index)
+    {
+        if (index < 0) return;
+        if (IsDressPurchased(index)) return;
+
+        int price = dressPrices.Length > index ? dressPrices[index] : 0;
+        if (gameManager.SpendCoins(price))
+        {
+            MarkDressPurchased(index);
+            priceText.text = "Owned ✅";
+            buyButton.SetActive(false);
+            PlayerPrefs.SetInt(PP_DRESS, index);
+            PlayerPrefs.Save();
+            Debug.Log("✅ Dress purchased!");
+        }
+        else
+        {
+            notEnoughCoinsUI.SetActive(true);
+            Debug.Log("❌ Not enough coins!");
+        }
+    }
+
+    // ===========================
+    // 💰 PURCHASE TRACKING
+    // ===========================
+
+    bool IsGlassPurchased(int index)
+    {
+        return PlayerPrefs.GetInt("Glass_Purchased_" + index, 0) == 1;
+    }
+
+    void MarkGlassPurchased(int index)
+    {
+        PlayerPrefs.SetInt("Glass_Purchased_" + index, 1);
+        PlayerPrefs.Save();
+    }
+
+    bool IsWatchPurchased(int index)
+    {
+        return PlayerPrefs.GetInt("Watch_Purchased_" + index, 0) == 1;
+    }
+
+    void MarkWatchPurchased(int index)
+    {
+        PlayerPrefs.SetInt("Watch_Purchased_" + index, 1);
+        PlayerPrefs.Save();
+    }
+
+    bool IsHatPurchased(int index)
+    {
+        return PlayerPrefs.GetInt("Hat_Purchased_" + index, 0) == 1;
+    }
+
+    void MarkHatPurchased(int index)
+    {
+        PlayerPrefs.SetInt("Hat_Purchased_" + index, 1);
+        PlayerPrefs.Save();
+    }
+
+    bool IsDressPurchased(int index)
+    {
+        return PlayerPrefs.GetInt("Dress_Purchased_" + index, 0) == 1;
+    }
+
+    void MarkDressPurchased(int index)
+    {
+        PlayerPrefs.SetInt("Dress_Purchased_" + index, 1);
+        PlayerPrefs.Save();
     }
 
     // ===========================
@@ -357,22 +647,10 @@ public class WardrobeManager : MonoBehaviour
     {
         switch (activeCategory)
         {
-            case ActiveCategory.Glasses: 
-                PlayCategorySound(glassesSound);
-                NextGlass();  
-                break;
-            case ActiveCategory.Watch:   
-                PlayCategorySound(watchSound);
-                NextWatch();  
-                break;
-            case ActiveCategory.Hat:     
-                PlayCategorySound(hatSound);
-                NextHat();    
-                break;
-            case ActiveCategory.Dress:   
-                PlayCategorySound(dressSound);
-                NextDress();  
-                break;
+            case ActiveCategory.Glasses: NextGlass(); break;
+            case ActiveCategory.Watch: NextWatch(); break;
+            case ActiveCategory.Hat: NextHat(); break;
+            case ActiveCategory.Dress: NextDress(); break;
         }
     }
 
@@ -380,22 +658,10 @@ public class WardrobeManager : MonoBehaviour
     {
         switch (activeCategory)
         {
-            case ActiveCategory.Glasses: 
-                PlayCategorySound(glassesSound);
-                PreviousGlass();  
-                break;
-            case ActiveCategory.Watch:   
-                PlayCategorySound(watchSound);
-                PreviousWatch();  
-                break;
-            case ActiveCategory.Hat:     
-                PlayCategorySound(hatSound);
-                PreviousHat();    
-                break;
-            case ActiveCategory.Dress:   
-                PlayCategorySound(dressSound);
-                PreviousDress();  
-                break;
+            case ActiveCategory.Glasses: PreviousGlass(); break;
+            case ActiveCategory.Watch: PreviousWatch(); break;
+            case ActiveCategory.Hat: PreviousHat(); break;
+            case ActiveCategory.Dress: PreviousDress(); break;
         }
     }
 
@@ -414,7 +680,7 @@ public class WardrobeManager : MonoBehaviour
         HideAllGlasses();
         HideAllWatches();
         HideAllHats();
-        HideAllDresses(); // ✅
+        HideAllDresses();
         activeCategory = ActiveCategory.None;
         leftButton.SetActive(false);
         rightButton.SetActive(false);

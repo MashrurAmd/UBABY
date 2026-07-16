@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -166,6 +166,11 @@ public class PlayerManager : MonoBehaviour
 
     public void GoOffice()
     {
+        if (WardrobeManager.Instance != null)
+        {
+            WardrobeManager.Instance.RevertToSaved();
+        }
+
         currentRoom = office;
         UpdateRoomCamera();
 
@@ -199,6 +204,11 @@ public class PlayerManager : MonoBehaviour
 
     public void GoKitchen()
     {
+        if (WardrobeManager.Instance != null)
+        {
+            WardrobeManager.Instance.RevertToSaved();
+        }
+
         currentRoom = kitchen;
         UpdateRoomCamera();
 
@@ -233,6 +243,11 @@ public class PlayerManager : MonoBehaviour
 
     public void GoShower()
     {
+        if (WardrobeManager.Instance != null)
+        {
+            WardrobeManager.Instance.RevertToSaved();
+        }
+
         currentRoom = shower;
         UpdateRoomCamera();
 
@@ -267,6 +282,11 @@ public class PlayerManager : MonoBehaviour
 
     public void GoBedroom()
     {
+        if (WardrobeManager.Instance != null)
+        {
+            WardrobeManager.Instance.RevertToSaved();
+        }
+
         currentRoom = bedroom;
         UpdateRoomCamera();
 

@@ -16,8 +16,8 @@ public class StoreManager : MonoBehaviour
     public Image selectedProductImage;
     public Text selectedProductText;
 
-    public GameObject storeText,availableProductsUI,myProductUI,getCoinsUI;
-    
+    public GameObject storeText, availableProductsUI, myProductUI, getCoinsUI;
+
 
     List<Product> listOfProducts = new List<Product>();
     public List<Product> myProducts = new List<Product>();
@@ -26,7 +26,7 @@ public class StoreManager : MonoBehaviour
     int selectedProductIndex;
     public Image kitchenProgressBar;
     float fill;
-    
+
     void Start()
     {
         LoadData();
@@ -38,7 +38,7 @@ public class StoreManager : MonoBehaviour
         //kitchenProgressBar.fillAmount = .5f;
         if (kitchenProgressBar.fillAmount < fill)
         {
-            kitchenProgressBar.fillAmount+=fillAmount;
+            kitchenProgressBar.fillAmount += fillAmount;
         }
     }
 
@@ -52,7 +52,7 @@ public class StoreManager : MonoBehaviour
             product.price = price;
             product.name = productsName[index];
             product.image = productsImage[index];
-            
+
             //print(" price "+price+" index "+index+" name "+ product.name+" image "+product.image );
             listOfProducts.Add(product);
             index++;
@@ -64,23 +64,28 @@ public class StoreManager : MonoBehaviour
     public void Buy(int productIndex)
     {
         int price = productsPrices[productIndex];
-        if (gameManager.currentCoins >= price)
+
+        // Route every coin deduction through GameManager.SpendCoins so
+        // there's a single source of truth for "can afford it / deduct it",
+        // shared with the wardrobe shop. This also gets the same
+        // instant local balance update, so back-to-back purchases here
+        // and in the wardrobe can't both read a stale, pre-deduction balance.
+        if (gameManager.SpendCoins(price))
         {
-            gameManager.AddCoins(-price);
             purchaseAudio.Play();
 
-             currentIndex=0;
-             bool found=false;
+            currentIndex = 0;
+            bool found = false;
             foreach (var product in myProducts)
             {
                 if (product.index == productIndex)
                 {
                     found = true;
                     myProducts[currentIndex].quantity++;
-                    print(" quantity "+ myProducts[currentIndex].quantity +" index "+productIndex);
+                    print(" quantity " + myProducts[currentIndex].quantity + " index " + productIndex);
                 }
                 currentIndex++;
-              
+
             }
 
             if (!found)
@@ -90,12 +95,12 @@ public class StoreManager : MonoBehaviour
                 newProduct.quantity = 1;
                 newProduct.name = productsName[productIndex];
                 newProduct.image = productsImage[productIndex];
-                
+
                 myProducts.Add(newProduct);
 
-                print(" quantity "+ newProduct.quantity +" index "+productIndex);
+                print(" quantity " + newProduct.quantity + " index " + productIndex);
             }
-            
+
             print(myProducts.Count);
         }
         else
@@ -106,7 +111,7 @@ public class StoreManager : MonoBehaviour
         CheckPurchasedProducts();
     }
 
-   public void CheckPurchasedProducts()
+    public void CheckPurchasedProducts()
     {
         if (myProducts.Count > 0)
         {
@@ -114,7 +119,7 @@ public class StoreManager : MonoBehaviour
             storeText.SetActive(false);
             myProductUI.SetActive(true);
             selectedProductImage.sprite = myProducts[selectedProductIndex].image;
-            selectedProductText.text = myProducts[selectedProductIndex].name+" x"+myProducts[selectedProductIndex].quantity;
+            selectedProductText.text = myProducts[selectedProductIndex].name + " x" + myProducts[selectedProductIndex].quantity;
         }
         else
         {
@@ -124,62 +129,62 @@ public class StoreManager : MonoBehaviour
         }
     }
 
-   public void Eat()
-   {
-       fill += .2f;
-       /*
-       kitchenProgressBar.fillAmount=kitchenProgressBar.fillAmount+fill;
-       */
-       int qnt = myProducts[selectedProductIndex].quantity;
-       if (qnt > 1)
-       {
-           myProducts[selectedProductIndex].quantity=qnt-1;
-       }
-       else
-       {
-           myProducts.RemoveAt(selectedProductIndex);
-           if (selectedProductIndex >= 1)
-           {
-               selectedProductIndex--;
-           }
-       }
+    public void Eat()
+    {
+        fill += .2f;
+        /*
+        kitchenProgressBar.fillAmount=kitchenProgressBar.fillAmount+fill;
+        */
+        int qnt = myProducts[selectedProductIndex].quantity;
+        if (qnt > 1)
+        {
+            myProducts[selectedProductIndex].quantity = qnt - 1;
+        }
+        else
+        {
+            myProducts.RemoveAt(selectedProductIndex);
+            if (selectedProductIndex >= 1)
+            {
+                selectedProductIndex--;
+            }
+        }
 
-       CheckPurchasedProducts();
-   }
+        CheckPurchasedProducts();
+    }
 
 
 
     public void NextProduct()
     {
-        selectedProductIndex ++;
-        if (selectedProductIndex > myProducts.Count-1)
+        selectedProductIndex++;
+        if (selectedProductIndex > myProducts.Count - 1)
         {
             selectedProductIndex = 0;
         }
         selectedProductImage.sprite = myProducts[selectedProductIndex].image;
-        selectedProductText.text= myProducts[selectedProductIndex].name+" x"+myProducts[selectedProductIndex].quantity;
+        selectedProductText.text = myProducts[selectedProductIndex].name + " x" + myProducts[selectedProductIndex].quantity;
         print(myProducts[selectedProductIndex].name);
     }
-    
+
     public void PreviousProduct()
     {
-        selectedProductIndex --;
+        selectedProductIndex--;
         if (selectedProductIndex < 0)
         {
-            selectedProductIndex = myProducts.Count-1 ;
+            selectedProductIndex = myProducts.Count - 1;
         }
         selectedProductImage.sprite = myProducts[selectedProductIndex].image;
-        selectedProductText.text= myProducts[selectedProductIndex].name+" x"+myProducts[selectedProductIndex].quantity;
-        print(myProducts[selectedProductIndex].name); 
+        selectedProductText.text = myProducts[selectedProductIndex].name + " x" + myProducts[selectedProductIndex].quantity;
+        print(myProducts[selectedProductIndex].name);
     }
 
     public void StoreIsOpen()
     {
         foreach (GameObject obj in hideOnOpen)
         {
-              obj.SetActive(false);
+            obj.SetActive(false);
         }
-        
+
         foreach (GameObject obj in hideOnClose)
         {
             obj.SetActive(true);
@@ -187,14 +192,14 @@ public class StoreManager : MonoBehaviour
         availableProductsUI.SetActive(false);
         CheckPurchasedProducts();
     }
-    
+
     public void StoreIsClosed()
     {
         foreach (GameObject obj in hideOnClose)
         {
             obj.SetActive(false);
         }
-        
+
         foreach (GameObject obj in hideOnOpen)
         {
             obj.SetActive(true);
@@ -211,11 +216,11 @@ public class StoreManager : MonoBehaviour
 
 }
 
-public class  Product{
+public class Product
+{
     public int index;
     public int quantity;
     public int price;
     public String name;
     public Sprite image;
 }
-

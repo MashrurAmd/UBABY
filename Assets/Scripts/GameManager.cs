@@ -35,6 +35,10 @@ public class GameManager : MonoBehaviour
 
     void OnFirebaseCoinsUpdated(int coins)
     {
+        // Authoritative reconciliation from the server. Under normal
+        // conditions this just confirms the optimistic update already
+        // applied in AddCoins/SpendCoins below; if the server value ever
+        // differs (failed write, another device, etc.) this corrects it.
         currentCoins = coins;
         UpdateUI();
     }
@@ -47,6 +51,15 @@ public class GameManager : MonoBehaviour
 
     public void AddCoins(int amount)
     {
+        // Update the local, authoritative-for-this-session value and the
+        // UI immediately (optimistic update). Without this, currentCoins
+        // only changes once the Firebase round-trip completes, which
+        // means any check made in the meantime (e.g. a second purchase
+        // fired before the first one's confirmation arrives) reads a
+        // stale balance and can pass when it shouldn't.
+        currentCoins += amount;
+        UpdateUI();
+
         FirebaseUserDataManager.Instance.AddCoins(amount);
     }
 
@@ -55,7 +68,12 @@ public class GameManager : MonoBehaviour
         if (currentCoins < amount)
             return false;
 
-        FirebaseUserDataManager.Instance.SaveCoins(currentCoins - amount);
+        // Same optimistic-update reasoning as AddCoins: deduct locally
+        // and refresh the UI right away, then persist to Firebase.
+        currentCoins -= amount;
+        UpdateUI();
+
+        FirebaseUserDataManager.Instance.SaveCoins(currentCoins);
         return true;
     }
 

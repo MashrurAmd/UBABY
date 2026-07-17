@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -46,6 +47,17 @@ public class PlayerManager : MonoBehaviour
     [Header("Sleep Sounds")]
     public AudioSource sleepSound1;
     public AudioSource sleepSound2;
+    public AudioSource wakeMeUpAudio; // ✅ "wakemeup" SFX — fires the instant the sleep bar hits full
+    private bool wakeUpSoundPlayed;   // ✅ guards against re-firing every frame once full
+    private Coroutine wakeUpAlarmCoroutine; // ✅ NEW: repeating alarm handle, so WakeUp() can stop it
+
+    [Header("Bored Sound")]
+    public AudioSource boredAudio;       // ✅ "bored" SFX — plays after a stretch of no player input
+    public float boredDelayMin = 10f;    // ✅ min idle seconds before bored plays
+    public float boredDelayMax = 15f;    // ✅ max idle seconds before bored plays
+    public AudioSource needsPopupAudio;  // ✅ NEW: same AudioSource as CatNeedsPopup's "Popup Audio" — drag it in so bored won't talk over hungry/sleep/shower/full lines
+    private float idleTimer;
+    private float nextBoredThreshold;
     
     [Header("Eating Settings")]
     public float mouthRadius = 200f; // ✅ adjust this in Inspector
@@ -65,6 +77,7 @@ public class PlayerManager : MonoBehaviour
         productMaxY = productMaxX;
         productMinY = -productMaxX;
         _waitTime = maxRecordTime;
+        nextBoredThreshold = Random.Range(boredDelayMin, boredDelayMax); // ✅ NEW: first bored delay
 
         // ✅ Apply multiplier
         productMaxX *= grabRadiusMultiplier;
@@ -91,6 +104,12 @@ public class PlayerManager : MonoBehaviour
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
             CheckBodyHit(Input.GetTouch(0).position);
 #endif
+
+        // ✅ NEW: any player input resets the bored timer
+        if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0) || Input.GetMouseButtonUp(0) || Input.touchCount > 0)
+            idleTimer = 0f;
+
+        UpdateBoredTimer(); // ✅ NEW: "bored" SFX after 10-15s of no input
 
         if (isRecording)
         {
@@ -157,6 +176,15 @@ public class PlayerManager : MonoBehaviour
         {
             if (sleepProgressBar.fillAmount <= 1)
                 sleepProgressBar.fillAmount += fillAmount;
+
+            // ✅ Alarm-style: starts repeating (every 5s) the instant the
+            // bar hits full, and keeps going until WakeUp() stops it (via
+            // the Wake Up button or any room-change, which all call WakeUp()).
+            if (!wakeUpSoundPlayed && sleepProgressBar.fillAmount >= 1f)
+            {
+                wakeUpAlarmCoroutine = StartCoroutine(WakeUpAlarmRoutine());
+                wakeUpSoundPlayed = true;
+            }
         }
     }
 
@@ -391,6 +419,50 @@ public class PlayerManager : MonoBehaviour
         storeManager.StoreIsClosed();
     }
 
+    // ✅ NEW: plays wakeMeUpAudio, waits 5s, repeats forever — stopped
+    // only by WakeUp() (Wake Up button or any room-change button).
+    IEnumerator WakeUpAlarmRoutine()
+    {
+        while (true)
+        {
+            if (wakeMeUpAudio != null)
+                wakeMeUpAudio.Play();
+            yield return new WaitForSeconds(5f);
+        }
+    }
+
+    // ===========================
+    // 🥱 BORED
+    // ===========================
+
+    // ✅ NEW: plays boredAudio after 10-15s (randomized) with no player
+    // input. Never fires while sleeping — the timer is held at 0 for the
+    // whole nap so it can't fire the instant the player wakes up.
+    void UpdateBoredTimer()
+    {
+        if (isSleeping)
+        {
+            idleTimer = 0f;
+            return;
+        }
+
+        idleTimer += Time.deltaTime;
+
+        if (idleTimer >= nextBoredThreshold)
+        {
+            // ✅ NEW: don't talk over hungry/sleep/shower/full lines —
+            // wait until that audio finishes, then play.
+            if (needsPopupAudio != null && needsPopupAudio.isPlaying)
+                return;
+
+            if (boredAudio != null && !boredAudio.isPlaying)
+                boredAudio.Play();
+
+            idleTimer = 0f;
+            nextBoredThreshold = Random.Range(boredDelayMin, boredDelayMax);
+        }
+    }
+
     // ===========================
     // 😴 SLEEP
     // ===========================
@@ -421,6 +493,18 @@ public class PlayerManager : MonoBehaviour
     {
         isSleeping = false;
         playerAnimator.SetBool("Sleep", false);           // ✅ exit sleep
+
+        // ✅ reset for the next sleep session — otherwise the bar
+        // stays maxed out forever and wakemeup can only ever fire once.
+        sleepProgressBar.fillAmount = 0f;
+        wakeUpSoundPlayed = false;
+        if (wakeUpAlarmCoroutine != null)
+        {
+            StopCoroutine(wakeUpAlarmCoroutine); // ✅ stop the repeating alarm
+            wakeUpAlarmCoroutine = null;
+        }
+        if (wakeMeUpAudio != null)
+            wakeMeUpAudio.Stop(); // ✅ cut off whatever's currently playing
 
         // ✅ Go back to lying if still in bedroom
         if (currentRoom == bedroom)

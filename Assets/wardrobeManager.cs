@@ -13,6 +13,7 @@ public class WardrobeManager : MonoBehaviour
     public AudioSource watchSound;    // drag watch change sound here
     public AudioSource hatSound;      // drag hat change sound here
     public AudioSource dressSound;    // drag dress change sound here
+    public AudioSource purchaseSound; // ✅ NEW: "adorable" SFX — plays whenever a new outfit item is bought
 
     [Header("Shop UI")]
     public Text priceText;          // shows price of current item
@@ -516,6 +517,7 @@ public class WardrobeManager : MonoBehaviour
             buyButton.SetActive(false);
             PlayerPrefs.SetInt(PP_GLASSES, index);
             PlayerPrefs.Save();
+            PlayCategorySound(purchaseSound); // ✅ NEW: "adorable" SFX
             Debug.Log("✅ Glass purchased!");
         }
         else
@@ -538,6 +540,7 @@ public class WardrobeManager : MonoBehaviour
             buyButton.SetActive(false);
             PlayerPrefs.SetInt(PP_WATCH, index);
             PlayerPrefs.Save();
+            PlayCategorySound(purchaseSound); // ✅ NEW: "adorable" SFX
             Debug.Log("✅ Watch purchased!");
         }
         else
@@ -560,6 +563,7 @@ public class WardrobeManager : MonoBehaviour
             buyButton.SetActive(false);
             PlayerPrefs.SetInt(PP_HAT, index);
             PlayerPrefs.Save();
+            PlayCategorySound(purchaseSound); // ✅ NEW: "adorable" SFX
             Debug.Log("✅ Hat purchased!");
         }
         else
@@ -582,6 +586,7 @@ public class WardrobeManager : MonoBehaviour
             buyButton.SetActive(false);
             PlayerPrefs.SetInt(PP_DRESS, index);
             PlayerPrefs.Save();
+            PlayCategorySound(purchaseSound); // ✅ NEW: "adorable" SFX
             Debug.Log("✅ Dress purchased!");
         }
         else

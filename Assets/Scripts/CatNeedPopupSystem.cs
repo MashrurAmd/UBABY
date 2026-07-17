@@ -15,6 +15,7 @@ public class CatNeedsPopup : MonoBehaviour
     public Text popupText;
     public AudioSource popupAudio;
     public AudioClip hungryClip, sleepClip, showerClip, fullClip;
+    public AudioClip iAmFullClip;  // ✅ "i am full" SFX — plays when the kitchen bar is full
     public Vector3 popupMoveOffset = new Vector3(0, 40, 0);
     public float popupDuration = 1f;
 
@@ -119,7 +120,7 @@ IEnumerator NeedsRoutine()
             if (storeManager.kitchenProgressBar.fillAmount >= 1f)
             {
                 popupActive = true;
-                ShowPopup("I am full 😺", fullClip, false);
+                ShowPopup("I am full 😺", iAmFullClip, false); // ✅ NEW: "i am full" SFX
                 lastPopupTime = Time.time;
                 popupActive = false;
             }
@@ -127,7 +128,10 @@ IEnumerator NeedsRoutine()
             if (playerManager.sleepProgressBar.fillAmount >= 1f)
             {
                 popupActive = true;
-                ShowPopup("Sleep done 😴", fullClip, false);
+                // ✅ audio moved to PlayerManager.Update() so it can fire
+                // while still asleep — this coroutine is skipped entirely
+                // during sleep, so it could never reach this line in time.
+                ShowPopup("Sleep done 😴", null, false);
                 lastPopupTime = Time.time;
                 popupActive = false;
             }
@@ -160,7 +164,7 @@ IEnumerator WaitUnlessSleeping(float duration)
 
     void ShowPopup(string msg, AudioClip clip, bool allowAnimation = true)
     {
-        if (popupAudio && clip) popupAudio.PlayOneShot(clip);
+        if (popupAudio && clip) StartCoroutine(PlayClipWhenBoredIsFree(clip));
 
         if (popupText)
         {
@@ -173,6 +177,16 @@ IEnumerator WaitUnlessSleeping(float duration)
                 StartCoroutine(HidePopupAfterTime(popupDuration));
             }
         }
+    }
+
+    // ✅ NEW: don't overlap with the bored SFX — wait for it to finish
+    // first, then play. Only the audio is delayed, not the popup text.
+    IEnumerator PlayClipWhenBoredIsFree(AudioClip clip)
+    {
+        while (playerManager != null && playerManager.boredAudio != null && playerManager.boredAudio.isPlaying)
+            yield return null;
+
+        popupAudio.PlayOneShot(clip);
     }
 
     IEnumerator PopupRoutine(string msg)

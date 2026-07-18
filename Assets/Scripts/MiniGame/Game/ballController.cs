@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -106,7 +106,7 @@ public class BallController : MonoBehaviour
                 Audio.Instance.PlaySFX(Audio.Instance.bomb);
 
             if (ScoreManager.Instance != null)
-                ScoreManager.Instance.AddScore(poppedCount * 5);
+                ScoreManager.Instance.AddScore(poppedCount);
 
             if (bombParticlePrefab != null)
                 Instantiate(bombParticlePrefab, transform.position, Quaternion.identity);
@@ -184,7 +184,7 @@ public class BallController : MonoBehaviour
             });
 
         if (ScoreManager.Instance != null)
-            ScoreManager.Instance.AddScore(poppedCount * 5);
+            ScoreManager.Instance.AddScore(poppedCount);
     }
 
     private void CheckClusterAndPop()
@@ -218,7 +218,7 @@ public class BallController : MonoBehaviour
             
 
             if (ScoreManager.Instance != null)
-                ScoreManager.Instance.AddScore(connectedBalls.Count * 5);
+                ScoreManager.Instance.AddScore(connectedBalls.Count);
         }
     }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using Firebase;
 using Firebase.Auth;
@@ -84,8 +84,15 @@ public class FirebaseUserDataManager : MonoBehaviour
     public void SaveCoins(int amount)
     {
         currentCoins = amount;
-        string uid = auth.CurrentUser.UserId;
-        dbRef.Child("Users").Child(uid).Child("coins").SetValueAsync(currentCoins);
+        if (auth != null && auth.CurrentUser != null && dbRef != null)
+        {
+            string uid = auth.CurrentUser.UserId;
+            dbRef.Child("Users").Child(uid).Child("coins").SetValueAsync(currentCoins);
+        }
+        else
+        {
+            Debug.LogWarning("Firebase Auth not initialized or user not logged in. Coins updated locally only.");
+        }
         OnCoinsUpdated?.Invoke(currentCoins);
     }
 

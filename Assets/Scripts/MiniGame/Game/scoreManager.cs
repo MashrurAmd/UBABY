@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class ScoreManager : MonoBehaviour
@@ -11,7 +11,7 @@ public class ScoreManager : MonoBehaviour
 
     [Header("Level Settings")]
     public int currentLevel = 1;
-    public int[] scoreThresholds = { 50, 150, 300 };
+    public int[] scoreThresholds = { 10, 30, 60 };
     
 
     public delegate void LevelUpAction(int newLevel);
@@ -28,6 +28,11 @@ public class ScoreManager : MonoBehaviour
         score += amount;
         UpdateUI();
         CheckLevelProgression();
+
+        if (FirebaseUserDataManager.Instance != null)
+        {
+            FirebaseUserDataManager.Instance.AddCoins(amount);
+        }
     }
 
 
@@ -36,7 +41,7 @@ public class ScoreManager : MonoBehaviour
     private void UpdateUI()
     {
         if (scoreText != null)
-            scoreText.text = "Score: " + score;
+            scoreText.text = "Coins: " + score;
     }
 
     private void CheckLevelProgression()

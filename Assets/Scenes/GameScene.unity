@@ -30868,7 +30868,7 @@ MonoBehaviour:
   watchSound: {fileID: 1897610789}
   hatSound: {fileID: 1298688171}
   dressSound: {fileID: 537772393}
-  purchaseSound: {fileID: 0}
+  purchaseSound: {fileID: 76774953}
   priceText: {fileID: 547667956}
   statusText: {fileID: 1786380253}
   buyButton: {fileID: 933819222}

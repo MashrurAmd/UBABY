@@ -1,4 +1,5 @@
 using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -40,6 +41,23 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button tutorialBackButton;
     [Tooltip("The 'Cursor' image's RectTransform, moved between pages")]
     [SerializeField] private RectTransform cursorRect;
+
+    [Header("Right Arrow Idle Pulse")]
+    [Tooltip("Seconds of no click before the right arrow starts pulsing")]
+    [SerializeField] private float rightButtonPulseIdleDelay = 2f;
+    [Tooltip("How big the right arrow grows at the top of each pulse (1 = no zoom)")]
+    [SerializeField] private float rightButtonPulseScale = 1.15f;
+    [Tooltip("Seconds for one zoom-in or zoom-out half of the pulse")]
+    [SerializeField] private float rightButtonPulseDuration = 0.5f;
+
+    private RectTransform tutorialRightButtonRect;
+    private Vector3 tutorialRightButtonOriginalScale = Vector3.one;
+    private Tween rightButtonPulseTween;
+    private Coroutine rightButtonPulseDelayCoroutine;
+    // Highest page index reached by moving forward — used so the pulse only
+    // ever plays the first time you arrive at a page, not when the left
+    // button brings you back to one you've already seen.
+    private int highestTutorialPageReached = -1;
 
     [Header("Sign In Loading")]
     [Tooltip("How long the throbber shows after tapping Sign In, before the Sign In panel appears")]
@@ -95,6 +113,13 @@ public class UIManager : MonoBehaviour
         if (tutorialRightButton != null) tutorialRightButton.onClick.AddListener(ShowNextTutorialPage);
         if (tutorialBackButton != null) tutorialBackButton.onClick.AddListener(OnTutorialBackButtonClicked);
 
+        if (tutorialRightButton != null)
+        {
+            tutorialRightButtonRect = tutorialRightButton.transform as RectTransform;
+            if (tutorialRightButtonRect != null)
+                tutorialRightButtonOriginalScale = tutorialRightButtonRect.localScale;
+        }
+
         ShowThrobber();   // on by default until FirebaseAuthManager decides what to show
     }
 
@@ -102,6 +127,13 @@ public class UIManager : MonoBehaviour
     {
         if (isSpinning && throbberSpinner != null)
             throbberSpinner.Rotate(0f, 0f, -spinSpeed * Time.deltaTime);
+    }
+
+    private void OnDestroy()
+    {
+        if (rightButtonPulseDelayCoroutine != null)
+            StopCoroutine(rightButtonPulseDelayCoroutine);
+        rightButtonPulseTween?.Kill();
     }
 
     // =========================================================================
@@ -157,6 +189,7 @@ public class UIManager : MonoBehaviour
 
         currentTutorialPage = 0;
         officeCursorShownOnce = false; // fresh tutorial session — Office gets its delayed reveal again
+        highestTutorialPageReached = -1;
         RefreshTutorialPages();
     }
 
@@ -236,6 +269,7 @@ public class UIManager : MonoBehaviour
         }
 
         UpdateTutorialNavButtons();
+        HandleRightButtonPulseForCurrentPage();
     }
 
     private IEnumerator ShowOfficeCursorAfterDelay()
@@ -274,6 +308,65 @@ public class UIManager : MonoBehaviour
             tutorialRightButton.gameObject.SetActive(currentTutorialPage < tutorialPages.Length - 1);
     }
 
+    // =========================================================================
+    // RIGHT ARROW IDLE PULSE
+    // =========================================================================
+
+    // Only pulses the first time you arrive at a page by moving forward,
+    // and only after rightButtonPulseIdleDelay seconds without a click.
+    // Revisiting a page via the left button never re-triggers it.
+    private void HandleRightButtonPulseForCurrentPage()
+    {
+        if (rightButtonPulseDelayCoroutine != null)
+        {
+            StopCoroutine(rightButtonPulseDelayCoroutine);
+            rightButtonPulseDelayCoroutine = null;
+        }
+        StopRightButtonPulse();
+
+        bool isLastPage = tutorialPages == null || currentTutorialPage >= tutorialPages.Length - 1;
+        if (isLastPage) return; // right arrow isn't shown here anyway
+
+        bool isNewForwardPage = currentTutorialPage > highestTutorialPageReached;
+        if (!isNewForwardPage) return; // already seen this page — no pulse on revisit
+
+        highestTutorialPageReached = currentTutorialPage;
+        rightButtonPulseDelayCoroutine = StartCoroutine(StartRightButtonPulseAfterDelay());
+    }
+
+    private IEnumerator StartRightButtonPulseAfterDelay()
+    {
+        yield return new WaitForSeconds(rightButtonPulseIdleDelay);
+        rightButtonPulseDelayCoroutine = null;
+        StartRightButtonPulse();
+    }
+
+    private void StartRightButtonPulse()
+    {
+        if (tutorialRightButtonRect == null) return;
+
+        // Restart fresh each time a page is shown, so navigating (or the
+        // click itself) always resets the animation cleanly.
+        StopRightButtonPulse();
+
+        rightButtonPulseTween = tutorialRightButtonRect
+            .DOScale(tutorialRightButtonOriginalScale * rightButtonPulseScale, rightButtonPulseDuration)
+            .SetEase(Ease.InOutSine)
+            .SetLoops(-1, LoopType.Yoyo);
+    }
+
+    private void StopRightButtonPulse()
+    {
+        if (rightButtonPulseTween != null)
+        {
+            rightButtonPulseTween.Kill();
+            rightButtonPulseTween = null;
+        }
+
+        if (tutorialRightButtonRect != null)
+            tutorialRightButtonRect.localScale = tutorialRightButtonOriginalScale;
+    }
+
     public void ShowNextTutorialPage()
     {
         if (tutorialPages == null || currentTutorialPage >= tutorialPages.Length - 1) return;
@@ -300,6 +393,14 @@ public class UIManager : MonoBehaviour
 
         if (tutorialPanel != null) tutorialPanel.SetActive(false);
         if (cursorRect != null) cursorRect.gameObject.SetActive(false);
+
+        if (rightButtonPulseDelayCoroutine != null)
+        {
+            StopCoroutine(rightButtonPulseDelayCoroutine);
+            rightButtonPulseDelayCoroutine = null;
+        }
+        StopRightButtonPulse();
+
         OpenIntroPanel();
     }
 

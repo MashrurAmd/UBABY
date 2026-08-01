@@ -9230,7 +9230,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &452506037
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11421,7 +11421,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 0
+  m_Text: 
 --- !u!222 &547667957
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -30878,6 +30878,11 @@ MonoBehaviour:
   dressPrices: f4010000e8030000dc050000
   gameManager: {fileID: 1244426639}
   notEnoughCoinsUI: {fileID: 2002407242}
+  notEnoughCoinsText: {fileID: 2002407244}
+  normalPriceColor: {r: 1, g: 1, b: 1, a: 1}
+  ownedColor: {r: 0, g: 1, b: 0, a: 1}
+  notEnoughCoinsColor: {r: 1, g: 0, b: 0, a: 1}
+  notEnoughCoinsDuration: 2
   hats:
   - {fileID: 1891680948}
   - {fileID: 1149673548}
@@ -35840,7 +35845,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &996027160
 RectTransform:
   m_ObjectHideFlags: 0

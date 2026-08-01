@@ -29,6 +29,13 @@ public class WardrobeManager : MonoBehaviour
     [Header("References")]
     public GameManager gameManager;       // drag GameManager here
     public GameObject notEnoughCoinsUI;   // drag a popup UI here
+    public Text notEnoughCoinsText;       // drag the Text inside that popup here
+    public Color normalPriceColor = Color.white;
+    public Color ownedColor = Color.green;
+    public Color notEnoughCoinsColor = Color.red;
+    public Color alreadyPurchasedColor = Color.yellow;
+    public float notEnoughCoinsDuration = 2f; // how long the popup stays visible
+    private Coroutine notEnoughCoinsRoutine;
 
     [Header("Hats")]
     public GameObject[] hats;
@@ -201,11 +208,13 @@ public class WardrobeManager : MonoBehaviour
             glasses[i].SetActive(false);
 
         currentGlassIndex = index;
+        HideStatusPopup();
 
         if (index == -1)
         {
             glassesNameText.text = "None";
             priceText.text = "";
+            priceText.color = normalPriceColor;
             buyButton.SetActive(false);
 
             PlayerPrefs.SetInt(PP_GLASSES, -1);
@@ -217,8 +226,10 @@ public class WardrobeManager : MonoBehaviour
 
         if (IsGlassPurchased(index))
         {
-            priceText.text = "Owned ✅";
-            buyButton.SetActive(false);
+            int price = glassesPrices.Length > index ? glassesPrices[index] : 0;
+            SetPriceStatus(price);
+            buyButton.SetActive(true);
+            ShowAlreadyPurchasedPopup();
 
             // Already owned items are free to wear — equip them as soon
             // as the player browses to them.
@@ -228,7 +239,7 @@ public class WardrobeManager : MonoBehaviour
         else
         {
             int price = glassesPrices.Length > index ? glassesPrices[index] : 0;
-            priceText.text = price + " 🪙";
+            SetPriceStatus(price);
             buyButton.SetActive(true);
         }
 
@@ -286,11 +297,13 @@ public class WardrobeManager : MonoBehaviour
             watches[i].SetActive(false);
 
         currentWatchIndex = index;
+        HideStatusPopup();
 
         if (index == -1)
         {
             watchNameText.text = "None";
             priceText.text = "";
+            priceText.color = normalPriceColor;
             buyButton.SetActive(false);
 
             PlayerPrefs.SetInt(PP_WATCH, -1);
@@ -302,8 +315,10 @@ public class WardrobeManager : MonoBehaviour
 
         if (IsWatchPurchased(index))
         {
-            priceText.text = "Owned ✅";
-            buyButton.SetActive(false);
+            int price = watchPrices.Length > index ? watchPrices[index] : 0;
+            SetPriceStatus(price);
+            buyButton.SetActive(true);
+            ShowAlreadyPurchasedPopup();
 
             PlayerPrefs.SetInt(PP_WATCH, index);
             PlayerPrefs.Save();
@@ -311,7 +326,7 @@ public class WardrobeManager : MonoBehaviour
         else
         {
             int price = watchPrices.Length > index ? watchPrices[index] : 0;
-            priceText.text = price + " 🪙";
+            SetPriceStatus(price);
             buyButton.SetActive(true);
         }
 
@@ -368,11 +383,13 @@ public class WardrobeManager : MonoBehaviour
             hats[i].SetActive(false);
 
         currentHatIndex = index;
+        HideStatusPopup();
 
         if (index == -1)
         {
             hatNameText.text = "None";
             priceText.text = "";
+            priceText.color = normalPriceColor;
             buyButton.SetActive(false);
 
             PlayerPrefs.SetInt(PP_HAT, -1);
@@ -384,8 +401,10 @@ public class WardrobeManager : MonoBehaviour
 
         if (IsHatPurchased(index))
         {
-            priceText.text = "Owned ✅";
-            buyButton.SetActive(false);
+            int price = hatPrices.Length > index ? hatPrices[index] : 0;
+            SetPriceStatus(price);
+            buyButton.SetActive(true);
+            ShowAlreadyPurchasedPopup();
 
             PlayerPrefs.SetInt(PP_HAT, index);
             PlayerPrefs.Save();
@@ -393,7 +412,7 @@ public class WardrobeManager : MonoBehaviour
         else
         {
             int price = hatPrices.Length > index ? hatPrices[index] : 0;
-            priceText.text = price + " 🪙";
+            SetPriceStatus(price);
             buyButton.SetActive(true);
         }
 
@@ -450,11 +469,13 @@ public class WardrobeManager : MonoBehaviour
             dresses[i].SetActive(false);
 
         currentDressIndex = index;
+        HideStatusPopup();
 
         if (index == -1)
         {
             dressNameText.text = "None";
             priceText.text = "";
+            priceText.color = normalPriceColor;
             buyButton.SetActive(false);
 
             PlayerPrefs.SetInt(PP_DRESS, -1);
@@ -466,8 +487,10 @@ public class WardrobeManager : MonoBehaviour
 
         if (IsDressPurchased(index))
         {
-            priceText.text = "Owned ✅";
-            buyButton.SetActive(false);
+            int price = dressPrices.Length > index ? dressPrices[index] : 0;
+            SetPriceStatus(price);
+            buyButton.SetActive(true);
+            ShowAlreadyPurchasedPopup();
 
             PlayerPrefs.SetInt(PP_DRESS, index);
             PlayerPrefs.Save();
@@ -475,7 +498,7 @@ public class WardrobeManager : MonoBehaviour
         else
         {
             int price = dressPrices.Length > index ? dressPrices[index] : 0;
-            priceText.text = price + " 🪙";
+            SetPriceStatus(price);
             buyButton.SetActive(true);
         }
 
@@ -487,6 +510,75 @@ public class WardrobeManager : MonoBehaviour
     {
         RefreshDressInfo(-1);
         dressButtonImage.sprite = dressInactiveSprite;
+    }
+
+    // ===========================
+    // 🎨 STATUS TEXT HELPERS
+    // ===========================
+
+    // Shows the price in the normal color (not owned yet).
+    void SetPriceStatus(int price)
+    {
+        priceText.text = price + " 🪙";
+        priceText.color = normalPriceColor;
+    }
+
+    // Shown in the priceText slot for items the player already owns.
+    void ShowAlreadyPurchasedPopup()
+    {
+        ShowStatusPopup("Already Purchased", alreadyPurchasedColor);
+    }
+
+    // Shows the "not enough coins" popup with real red text
+    // instead of the default placeholder "New Text".
+    void ShowNotEnoughCoins()
+    {
+        ShowStatusPopup("Not enough coins!", notEnoughCoinsColor);
+    }
+
+    void ShowPurchasedPopup()
+    {
+        ShowStatusPopup("Purchased", ownedColor);
+    }
+
+    // Shared popup — same GameObject/Text used for both the
+    // "not enough coins" and "purchased" messages.
+    void ShowStatusPopup(string message, Color color)
+    {
+        if (notEnoughCoinsUI != null)
+            notEnoughCoinsUI.SetActive(true);
+
+        if (notEnoughCoinsText != null)
+        {
+            notEnoughCoinsText.text = message;
+            notEnoughCoinsText.color = color;
+        }
+
+        // Restart the hide timer each time, so repeated clicks keep it visible.
+        if (notEnoughCoinsRoutine != null)
+            StopCoroutine(notEnoughCoinsRoutine);
+        notEnoughCoinsRoutine = StartCoroutine(HideNotEnoughCoinsAfterDelay());
+    }
+
+    System.Collections.IEnumerator HideNotEnoughCoinsAfterDelay()
+    {
+        yield return new WaitForSeconds(notEnoughCoinsDuration);
+        if (notEnoughCoinsUI != null)
+            notEnoughCoinsUI.SetActive(false);
+        notEnoughCoinsRoutine = null;
+    }
+
+    // Immediately closes the popup — used when browsing to "None",
+    // so a lingering "Already Purchased" message doesn't hang around.
+    void HideStatusPopup()
+    {
+        if (notEnoughCoinsRoutine != null)
+        {
+            StopCoroutine(notEnoughCoinsRoutine);
+            notEnoughCoinsRoutine = null;
+        }
+        if (notEnoughCoinsUI != null)
+            notEnoughCoinsUI.SetActive(false);
     }
 
     // ===========================
@@ -507,14 +599,15 @@ public class WardrobeManager : MonoBehaviour
     void BuyGlass(int index)
     {
         if (index < 0) return;
-        if (IsGlassPurchased(index)) return; // already owned, nothing to buy
+        if (IsGlassPurchased(index)) { ShowAlreadyPurchasedPopup(); return; } // already owned
 
         int price = glassesPrices.Length > index ? glassesPrices[index] : 0;
         if (gameManager.SpendCoins(price))
         {
             MarkGlassPurchased(index);
-            priceText.text = "Owned ✅";
-            buyButton.SetActive(false);
+            SetPriceStatus(price);
+            buyButton.SetActive(true);
+            ShowPurchasedPopup();
             PlayerPrefs.SetInt(PP_GLASSES, index);
             PlayerPrefs.Save();
             PlayCategorySound(purchaseSound); // ✅ NEW: "adorable" SFX
@@ -522,7 +615,7 @@ public class WardrobeManager : MonoBehaviour
         }
         else
         {
-            notEnoughCoinsUI.SetActive(true);
+            ShowNotEnoughCoins();
             Debug.Log("❌ Not enough coins!");
         }
     }
@@ -530,14 +623,15 @@ public class WardrobeManager : MonoBehaviour
     void BuyWatch(int index)
     {
         if (index < 0) return;
-        if (IsWatchPurchased(index)) return;
+        if (IsWatchPurchased(index)) { ShowAlreadyPurchasedPopup(); return; } // already owned
 
         int price = watchPrices.Length > index ? watchPrices[index] : 0;
         if (gameManager.SpendCoins(price))
         {
             MarkWatchPurchased(index);
-            priceText.text = "Owned ✅";
-            buyButton.SetActive(false);
+            SetPriceStatus(price);
+            buyButton.SetActive(true);
+            ShowPurchasedPopup();
             PlayerPrefs.SetInt(PP_WATCH, index);
             PlayerPrefs.Save();
             PlayCategorySound(purchaseSound); // ✅ NEW: "adorable" SFX
@@ -545,7 +639,7 @@ public class WardrobeManager : MonoBehaviour
         }
         else
         {
-            notEnoughCoinsUI.SetActive(true);
+            ShowNotEnoughCoins();
             Debug.Log("❌ Not enough coins!");
         }
     }
@@ -553,14 +647,15 @@ public class WardrobeManager : MonoBehaviour
     void BuyHat(int index)
     {
         if (index < 0) return;
-        if (IsHatPurchased(index)) return;
+        if (IsHatPurchased(index)) { ShowAlreadyPurchasedPopup(); return; } // already owned
 
         int price = hatPrices.Length > index ? hatPrices[index] : 0;
         if (gameManager.SpendCoins(price))
         {
             MarkHatPurchased(index);
-            priceText.text = "Owned ✅";
-            buyButton.SetActive(false);
+            SetPriceStatus(price);
+            buyButton.SetActive(true);
+            ShowPurchasedPopup();
             PlayerPrefs.SetInt(PP_HAT, index);
             PlayerPrefs.Save();
             PlayCategorySound(purchaseSound); // ✅ NEW: "adorable" SFX
@@ -568,7 +663,7 @@ public class WardrobeManager : MonoBehaviour
         }
         else
         {
-            notEnoughCoinsUI.SetActive(true);
+            ShowNotEnoughCoins();
             Debug.Log("❌ Not enough coins!");
         }
     }
@@ -576,14 +671,15 @@ public class WardrobeManager : MonoBehaviour
     void BuyDress(int index)
     {
         if (index < 0) return;
-        if (IsDressPurchased(index)) return;
+        if (IsDressPurchased(index)) { ShowAlreadyPurchasedPopup(); return; } // already owned
 
         int price = dressPrices.Length > index ? dressPrices[index] : 0;
         if (gameManager.SpendCoins(price))
         {
             MarkDressPurchased(index);
-            priceText.text = "Owned ✅";
-            buyButton.SetActive(false);
+            SetPriceStatus(price);
+            buyButton.SetActive(true);
+            ShowPurchasedPopup();
             PlayerPrefs.SetInt(PP_DRESS, index);
             PlayerPrefs.Save();
             PlayCategorySound(purchaseSound); // ✅ NEW: "adorable" SFX
@@ -591,7 +687,7 @@ public class WardrobeManager : MonoBehaviour
         }
         else
         {
-            notEnoughCoinsUI.SetActive(true);
+            ShowNotEnoughCoins();
             Debug.Log("❌ Not enough coins!");
         }
     }

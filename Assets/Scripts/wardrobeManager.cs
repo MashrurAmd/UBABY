@@ -161,7 +161,10 @@ public class WardrobeManager : MonoBehaviour
             for (int i = 0; i < dresses.Length; i++)
                 if (dresses[i] != null) dresses[i].SetActive(false);
             if (currentDressIndex >= 0 && currentDressIndex < dresses.Length && dresses[currentDressIndex] != null)
+            {
                 dresses[currentDressIndex].SetActive(true);
+                DressRendererFixer.FixAndResetDress(dresses[currentDressIndex]);
+            }
         }
     }
 
@@ -489,6 +492,7 @@ public class WardrobeManager : MonoBehaviour
         }
 
         dresses[index].SetActive(true);
+        DressRendererFixer.FixAndResetDress(dresses[index]);
 
         if (IsDressPurchased(index))
         {

@@ -98,6 +98,11 @@ public class WardrobeManager : MonoBehaviour
     void Start()
     {
         LoadWardrobe();
+
+        // Fix dress SkinnedMeshRenderers for Android:
+        // Enables UpdateWhenOffscreen (so empty-bone meshes aren't culled)
+        // and removes redundant MeshRenderer/MeshFilter components.
+        DressRendererFixer.FixDressRenderers(dresses);
     }
 
     private void OnDisable()

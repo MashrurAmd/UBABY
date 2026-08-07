@@ -12036,7 +12036,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 104f13cee6cdcab4687c44ba76d0917e, type: 2}
+  m_Sprite: {fileID: 21300000, guid: 892c17578f2b2ca47823983e1867ee93, type: 2}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -30882,6 +30882,7 @@ MonoBehaviour:
   normalPriceColor: {r: 1, g: 1, b: 1, a: 1}
   ownedColor: {r: 0, g: 1, b: 0, a: 1}
   notEnoughCoinsColor: {r: 1, g: 0, b: 0, a: 1}
+  alreadyPurchasedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   notEnoughCoinsDuration: 2
   hats:
   - {fileID: 1891680948}

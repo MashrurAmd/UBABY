@@ -28,6 +28,7 @@ public class WardrobeManager : MonoBehaviour
     public GameManager gameManager;       // drag GameManager here
     public GameObject notEnoughCoinsUI;   // drag a popup UI here
     public Text notEnoughCoinsText;       // drag the Text inside that popup here
+    public GameObject getCoinsUI;         // drag Get Coins UI panel here
     public Color normalPriceColor = Color.white;
     public Color ownedColor = Color.green;
     public Color notEnoughCoinsColor = Color.red;
@@ -53,6 +54,7 @@ public class WardrobeManager : MonoBehaviour
     public Image glassesButtonImage;
     public Image watchButtonImage;
     public Image hatButtonImage;
+    public Image cardIconImage;          // preview icon inside Store_Card frame
     public Sprite glassesActiveSprite;
     public Sprite glassesInactiveSprite;
     public Sprite watchActiveSprite;
@@ -148,6 +150,7 @@ public class WardrobeManager : MonoBehaviour
         if (glassesButtonImage != null) glassesButtonImage.sprite = glassesActiveSprite;
         if (watchButtonImage != null) watchButtonImage.sprite = watchInactiveSprite;
         if (hatButtonImage != null) hatButtonImage.sprite = hatInactiveSprite;
+        if (cardIconImage != null && glassesActiveSprite != null) cardIconImage.sprite = glassesActiveSprite;
 
         RefreshGlassInfo(currentGlassIndex);
     }
@@ -232,6 +235,7 @@ public class WardrobeManager : MonoBehaviour
         if (watchButtonImage != null) watchButtonImage.sprite = watchActiveSprite;
         if (glassesButtonImage != null) glassesButtonImage.sprite = glassesInactiveSprite;
         if (hatButtonImage != null) hatButtonImage.sprite = hatInactiveSprite;
+        if (cardIconImage != null && watchActiveSprite != null) cardIconImage.sprite = watchActiveSprite;
 
         RefreshWatchInfo(currentWatchIndex);
     }
@@ -316,6 +320,7 @@ public class WardrobeManager : MonoBehaviour
         if (hatButtonImage != null) hatButtonImage.sprite = hatActiveSprite;
         if (glassesButtonImage != null) glassesButtonImage.sprite = glassesInactiveSprite;
         if (watchButtonImage != null) watchButtonImage.sprite = watchInactiveSprite;
+        if (cardIconImage != null && hatActiveSprite != null) cardIconImage.sprite = hatActiveSprite;
 
         RefreshHatInfo(currentHatIndex);
     }
@@ -416,6 +421,10 @@ public class WardrobeManager : MonoBehaviour
     void ShowNotEnoughCoins()
     {
         ShowStatusPopup("Not enough coins!", notEnoughCoinsColor);
+        if (getCoinsUI != null)
+        {
+            getCoinsUI.SetActive(true);
+        }
     }
 
     void ShowPurchasedPopup()
